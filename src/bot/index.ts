@@ -1,6 +1,7 @@
 import {Bot, GrammyError, HttpError} from "grammy";
 
-const bot = new Bot(process.env.BOT_TOKEN || "");
+console.log(process.env.DATABASE_URL)
+export const bot = new Bot(process.env.BOT_TOKEN || "");
 
 bot.catch((err) => {
     const ctx = err.ctx;
