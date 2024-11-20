@@ -12,3 +12,90 @@ datasource db {
   provider = "mongodb"
   url      = env("DATABASE_URL")
 }
+
+enum UserRole {
+  USER
+  ADMIN
+  MANAGER
+  SUPER_ADMIN
+}
+
+model User {
+  id             String     @id @default(auto()) @map("_id") @db.ObjectId
+  tgId           Int        @unique
+  username       String?
+  firstName      String?
+  lastName       String?
+  languageCode   String?
+  roles          UserRole[] @default([USER])
+  client_orders  Order[]    @relation("Client")
+  manager_orders Order[]    @relation("Manager")
+  updatedAt      DateTime   @updatedAt
+  createdAt      DateTime   @default(now())
+}
+
+model Specification {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  field     String
+  value     String
+  carCard   CarCard  @relation(fields: [carCardId], references: [id])
+  carCardId String   @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum FiatAsset {
+  USD
+  EUR
+  RUB
+  BYN
+  UAH
+  GBP
+  CNY
+  KZT
+  UZS
+  GEL
+  TRY
+  AMD
+  THB
+  INR
+  BRL
+  IDR
+  AZN
+  AED
+  PLN
+  ILS
+}
+
+model CarCard {
+  id             String          @id @default(auto()) @map("_id") @db.ObjectId
+  specifications Specification[]
+  photos         File[]
+  description    String
+  price          String?
+  currency       FiatAsset?
+  isActive       Boolean
+  order          Order?          @relation(fields: [orderId], references: [id])
+  orderId        String?         @db.ObjectId
+}
+
+model File {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  domain    String
+  file_size Int
+  key       String
+  bucket    String
+  CarCard   CarCard? @relation(fields: [carCardId], references: [id])
+  carCardId String?  @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Order {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  carCards  CarCard[]
+  user      User      @relation("Client", fields: [userId], references: [id])
+  userId    String    @db.ObjectId
+  manager   User?     @relation("Manager", fields: [userId], references: [id])
+  managerId String?
+}

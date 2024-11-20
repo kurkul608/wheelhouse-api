@@ -1,1 +1,4 @@
-console.log('Happy developing ✨')
+import { PrismaClient } from '@prisma/client'
+
+const prisma = new PrismaClient()
+// console.log('Happy developing ✨')
