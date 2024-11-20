@@ -1,7 +1,13 @@
 import {Bot, GrammyError, HttpError} from "grammy";
+import dotenv from "dotenv";
 
-console.log(process.env.DATABASE_URL)
+dotenv.config();
+
 export const bot = new Bot(process.env.BOT_TOKEN || "");
+
+bot.command("start", async (ctx) => {
+    await ctx.reply("Starting...");
+})
 
 bot.catch((err) => {
     const ctx = err.ctx;

@@ -1,6 +1,9 @@
 import fastify from "fastify";
 import fastifyCors from "@fastify/cors";
+import dotenv from "dotenv";
 import {bot} from "./bot";
+
+dotenv.config();
 
 const server = fastify({ logger: true });
 
@@ -22,7 +25,7 @@ bot.start().then(() => {
 });
 
 server.listen(
-    { port: +(process.env.PORT || 8080), host: "0.0.0.0" },
+    { port: +(process.env.PORT || ""), host: "0.0.0.0" },
     (err, address) => {
         if (err) {
             console.error(err);
