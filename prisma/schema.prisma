@@ -37,6 +37,7 @@ model User {
 model Specification {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   field     String
+  fieldName String
   value     String
   carCard   CarCard  @relation(fields: [carCardId], references: [id])
   carCardId String   @db.ObjectId
@@ -69,8 +70,10 @@ enum FiatAsset {
 
 model CarCard {
   id             String          @id @default(auto()) @map("_id") @db.ObjectId
+  externalId     String?         @unique
   specifications Specification[]
   photos         File[]
+  importedPhotos String[]
   description    String
   price          String?
   currency       FiatAsset?
