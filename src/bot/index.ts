@@ -1,24 +1,31 @@
-import { Bot, GrammyError, HttpError } from "grammy";
+import { Bot, GrammyError, HttpError, InlineKeyboard } from "grammy";
 import dotenv from "dotenv";
 import { UserRole } from "@prisma/client";
 import { createUserService } from "../services/user/create.user.service";
 
 dotenv.config();
 
-export const bot = new Bot(process.env.BOT_TOKEN || "");
+export const bot = new Bot(process.env.BOT_TOKEN || "", {
+  client: { environment: "test" },
+});
 
 bot.command("start", async (ctx) => {
-  const user = await createUserService({
-    tgId: ctx.from!.id,
-    username: ctx.from?.username,
-    firstName: ctx.from?.first_name,
-    lastName: ctx.from?.last_name,
-    languageCode: ctx.from?.language_code,
-    roles: [UserRole.USER],
-  });
-
-  await ctx.reply("Starting...");
-  await ctx.reply(`Твой id: ${user.id}`);
+  // const user = await createUserService({
+  //   tgId: ctx.from!.id,
+  //   username: ctx.from?.username,
+  //   firstName: ctx.from?.first_name,
+  //   lastName: ctx.from?.last_name,
+  //   languageCode: ctx.from?.language_code,
+  //   roles: [UserRole.USER],
+  // });
+  //
+  // await ctx.reply("Starting...");
+  // await ctx.reply(`Твой id: ${user.id}`);
+  const keyboard = new InlineKeyboard().webApp(
+    "Some web app",
+    "http://zzz.com:3000",
+  );
+  await ctx.reply("Button", { reply_markup: keyboard });
 });
 
 bot.catch((err) => {
