@@ -22,7 +22,7 @@ enum UserRole {
 
 model User {
   id             String     @id @default(auto()) @map("_id") @db.ObjectId
-  tgId           Int        @unique
+  tgId           Int?       @unique
   username       String?
   firstName      String?
   lastName       String?
@@ -32,6 +32,7 @@ model User {
   manager_orders Order[]    @relation("Manager")
   updatedAt      DateTime   @updatedAt
   createdAt      DateTime   @default(now())
+  Bucket         Bucket?
 }
 
 model Specification {
@@ -81,6 +82,7 @@ model CarCard {
   isActive       Boolean
   order          Order?          @relation(fields: [orderId], references: [id])
   orderId        String?         @db.ObjectId
+  BucketCarCard  BucketCarCard[]
 }
 
 model File {
@@ -102,4 +104,23 @@ model Order {
   userId    String    @db.ObjectId
   manager   User?     @relation("Manager", fields: [userId], references: [id])
   managerId String?
+}
+
+model Bucket {
+  id            String          @id @default(auto()) @map("_id") @db.ObjectId
+  userId        String          @unique @db.ObjectId
+  user          User            @relation(fields: [userId], references: [id])
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  BucketCarCard BucketCarCard[]
+}
+
+model BucketCarCard {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  bucketId  String   @db.ObjectId
+  bucket    Bucket   @relation(fields: [bucketId], references: [id])
+  carCardId String   @db.ObjectId
+  carCard   CarCard  @relation(fields: [carCardId], references: [id])
+  addedAt   DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

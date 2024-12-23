@@ -2,12 +2,11 @@ import { Prisma } from "@prisma/client";
 import prisma from "../../prisma";
 import { createBucket } from "../bucket/create.bucket.service";
 
-export const createUserService = async (
-  userDto: Prisma.UserCreateInput,
-): Promise<Prisma.UserGetPayload<any>> => {
+export const getByTgIdUserService = async (
+  userTgId: number,
+): Promise<Prisma.UserGetPayload<any> | null> => {
   try {
-    const user = await prisma.user.create({ data: userDto });
-    const bucket = await createBucket(user.id);
+    const user = await prisma.user.findUnique({ where: { tgId: userTgId } });
 
     return user;
   } catch (error) {
