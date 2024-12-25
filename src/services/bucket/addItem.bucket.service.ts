@@ -29,7 +29,5 @@ export async function addItemToBucket(userId: string, carCardId: string) {
   } catch (error) {
     console.error("Error adding item to bucket:", error);
     throw error;
-  } finally {
-    await prisma.$disconnect();
   }
 }
