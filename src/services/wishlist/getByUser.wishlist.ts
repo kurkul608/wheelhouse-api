@@ -10,7 +10,7 @@ export const getByUserWishlist = async (
     where: { userId },
     include: {
       WishlistCarCard: {
-        include: { carCard: true },
+        include: { carCard: { include: { specifications: true } } },
       },
     },
   });
