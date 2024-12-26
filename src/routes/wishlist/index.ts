@@ -1,24 +1,23 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-import { getByUserBucket } from "../../services/bucket/getByUser.bucket";
 import { authMiddleware } from "../../middlewares/authMiddleware";
 import { getIdByToken } from "../../utils/auth";
 import { getByTgIdUserService } from "../../services/user/getByTgId.user.service";
-import { addItemToBucket } from "../../services/bucket/addItem.bucket.service";
-import * as repl from "node:repl";
-import { deleteItemFromBucket } from "../../services/bucket/deleteItem.bucket.service";
+import { getByUserWishlist } from "../../services/wishlist/getByUser.wishlist";
+import { addItemToWishlist } from "../../services/wishlist/addItem.wishlist.service";
+import { deleteItemFromWishlist } from "../../services/wishlist/deleteItem.wishlist.service";
 
-interface GetBucketByUserParams {
+interface GetWishlistByUserParams {
   userId: string;
 }
-interface AddToBucketParams {
+interface AddToWishlistParams {
   carCardId: string;
 }
 
-export async function bucketRoutes(fastify: FastifyInstance) {
+export async function wishlistRoutes(fastify: FastifyInstance) {
   fastify.addHook("preHandler", authMiddleware);
 
   fastify.get(
-    "/bucket/user/:userId",
+    "/wishlist/user/:userId",
     {
       schema: {
         params: {
@@ -34,24 +33,24 @@ export async function bucketRoutes(fastify: FastifyInstance) {
       try {
         const userTgId = getIdByToken(request.headers.authorization || "");
         const existUser = await getByTgIdUserService(userTgId);
-        const { userId } = request.params as GetBucketByUserParams;
+        const { userId } = request.params as GetWishlistByUserParams;
 
         if (
           existUser?.id !== userId &&
           !existUser?.roles.some((role) => role === "ADMIN")
         ) {
-          return reply.status(403).send("User is not owner of bucket");
+          return reply.status(403).send("User is not owner of wishlist");
         }
-        const bucket = await getByUserBucket(userId);
-        reply.status(200).send(bucket);
+        const wishlist = await getByUserWishlist(userId);
+        reply.status(200).send(wishlist);
       } catch (error) {
-        fastify.log.error("Error get bucket by userID:", error);
-        reply.status(500).send({ error: "Unable to get bucket by userID" });
+        fastify.log.error("Error get wishlist by userID:", error);
+        reply.status(500).send({ error: "Unable to get wishlist by userID" });
       }
     },
   );
   fastify.post(
-    "/bucket/add/:carCardId",
+    "/wishlist/add/:carCardId",
     {
       schema: {
         params: {
@@ -67,23 +66,23 @@ export async function bucketRoutes(fastify: FastifyInstance) {
       try {
         const userTgId = getIdByToken(request.headers.authorization || "");
         const existUser = await getByTgIdUserService(userTgId);
-        const { carCardId } = request.params as AddToBucketParams;
+        const { carCardId } = request.params as AddToWishlistParams;
 
         if (!existUser?.id) {
-          return reply.status(403).send("User is not owner of bucket");
+          return reply.status(403).send("User is not owner of wishlist");
         }
 
-        const bucket = await addItemToBucket(existUser.id, carCardId);
+        const wishlist = await addItemToWishlist(existUser.id, carCardId);
 
-        reply.status(200).send(bucket);
+        reply.status(200).send(wishlist);
       } catch (error) {
-        fastify.log.error("Error add to bucket:", error);
-        reply.status(500).send({ error: "Unable to add to bucket" });
+        fastify.log.error("Error add to wishlist:", error);
+        reply.status(500).send({ error: "Unable to add to wishlist" });
       }
     },
   );
   fastify.delete(
-    "/bucket/delete/:carCardId",
+    "/wishlist/delete/:carCardId",
     {
       schema: {
         params: {
@@ -99,18 +98,18 @@ export async function bucketRoutes(fastify: FastifyInstance) {
       try {
         const userTgId = getIdByToken(request.headers.authorization || "");
         const existUser = await getByTgIdUserService(userTgId);
-        const { carCardId } = request.params as AddToBucketParams;
+        const { carCardId } = request.params as AddToWishlistParams;
 
         if (!existUser?.id) {
-          return reply.status(403).send("User is not owner of bucket");
+          return reply.status(403).send("User is not owner of wishlist");
         }
 
-        const result = await deleteItemFromBucket(existUser.id, carCardId);
+        const result = await deleteItemFromWishlist(existUser.id, carCardId);
 
         reply.status(200).send(result);
       } catch (error) {
-        fastify.log.error("Error delete to bucket:", error);
-        reply.status(500).send({ error: "Unable to delete to bucket" });
+        fastify.log.error("Error delete to wishlist:", error);
+        reply.status(500).send({ error: "Unable to delete to wishlist" });
       }
     },
   );

@@ -5,6 +5,7 @@ import { carCardRoutes } from "../routes/carCard";
 import { authMiddleware } from "../middlewares/authMiddleware";
 import { userRoutes } from "../routes/user";
 import { bucketRoutes } from "../routes/bucket";
+import { wishlistRoutes } from "../routes/wishlist";
 
 export const server = fastify({ logger: true });
 
@@ -30,3 +31,4 @@ server.setErrorHandler((error, request, reply) => {
 server.register(carCardRoutes);
 server.register(userRoutes);
 server.register(bucketRoutes);
+server.register(wishlistRoutes);

@@ -33,6 +33,7 @@ model User {
   updatedAt      DateTime   @updatedAt
   createdAt      DateTime   @default(now())
   Bucket         Bucket?
+  Wishlist       Wishlist?
 }
 
 model Specification {
@@ -70,19 +71,20 @@ enum FiatAsset {
 }
 
 model CarCard {
-  id             String          @id @default(auto()) @map("_id") @db.ObjectId
-  externalId     String?         @unique
-  inStock        Boolean         @default(false)
-  specifications Specification[]
-  photos         File[]
-  importedPhotos String[]
-  description    String
-  price          String?
-  currency       FiatAsset?
-  isActive       Boolean
-  order          Order?          @relation(fields: [orderId], references: [id])
-  orderId        String?         @db.ObjectId
-  BucketCarCard  BucketCarCard[]
+  id              String            @id @default(auto()) @map("_id") @db.ObjectId
+  externalId      String?           @unique
+  inStock         Boolean           @default(false)
+  specifications  Specification[]
+  photos          File[]
+  importedPhotos  String[]
+  description     String
+  price           String?
+  currency        FiatAsset?
+  isActive        Boolean
+  order           Order?            @relation(fields: [orderId], references: [id])
+  orderId         String?           @db.ObjectId
+  BucketCarCard   BucketCarCard[]
+  WishlistCarCard WishlistCarCard[]
 }
 
 model File {
@@ -123,4 +125,23 @@ model BucketCarCard {
   carCard   CarCard  @relation(fields: [carCardId], references: [id])
   addedAt   DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Wishlist {
+  id              String            @id @default(auto()) @map("_id") @db.ObjectId
+  userId          String            @unique @db.ObjectId
+  user            User              @relation(fields: [userId], references: [id])
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  WishlistCarCard WishlistCarCard[]
+}
+
+model WishlistCarCard {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  wishlistId String   @db.ObjectId
+  wishlist   Wishlist @relation(fields: [wishlistId], references: [id])
+  carCardId  String   @db.ObjectId
+  carCard    CarCard  @relation(fields: [carCardId], references: [id])
+  addedAt    DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
