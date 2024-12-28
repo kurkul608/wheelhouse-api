@@ -6,6 +6,7 @@ import { authMiddleware } from "../middlewares/authMiddleware";
 import { userRoutes } from "../routes/user";
 import { bucketRoutes } from "../routes/bucket";
 import { wishlistRoutes } from "../routes/wishlist";
+import { orderRoutes } from "../routes/oreder";
 
 export const server = fastify({ logger: true });
 
@@ -32,3 +33,4 @@ server.register(carCardRoutes);
 server.register(userRoutes);
 server.register(bucketRoutes);
 server.register(wishlistRoutes);
+server.register(orderRoutes);

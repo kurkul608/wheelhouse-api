@@ -2,30 +2,33 @@ import prisma from "../../prisma";
 
 export async function addItemToWishlist(userId: string, carCardId: string) {
   try {
-    const wishlist = await prisma.wishlist.findUnique({
-      where: { userId },
-    });
+    const [wishlist, carCard] = await Promise.all([
+      prisma.wishlist.findUnique({ where: { userId } }),
+      prisma.carCard.findUnique({ where: { id: carCardId } }),
+    ]);
 
     if (!wishlist) {
       throw new Error("wishlist not found for this user");
     }
 
-    const wishlistCarCardExist = await prisma.wishlistCarCard.findFirst({
-      where: { carCardId, wishlistId: wishlist.id },
-    });
+    if (!carCard) {
+      throw new Error(`CarCard с ID ${carCardId} не найден`);
+    }
 
-    if (wishlistCarCardExist) {
+    if (wishlist.carCardIds.some((id) => id === carCardId)) {
       throw new Error("CarCard is already in the wishlist");
     }
 
-    const wishlistCarCard = await prisma.wishlistCarCard.create({
+    const updatedWishlist = await prisma.wishlist.update({
+      where: { userId },
       data: {
-        wishlistId: wishlist.id,
-        carCardId,
+        carCardIds: {
+          push: carCardId,
+        },
       },
     });
 
-    return wishlistCarCard;
+    return updatedWishlist;
   } catch (error) {
     console.error("Error adding item to wishlist:", error);
     throw error;

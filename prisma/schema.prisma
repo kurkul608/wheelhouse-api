@@ -71,20 +71,21 @@ enum FiatAsset {
 }
 
 model CarCard {
-  id              String            @id @default(auto()) @map("_id") @db.ObjectId
-  externalId      String?           @unique
-  inStock         Boolean           @default(false)
-  specifications  Specification[]
-  photos          File[]
-  importedPhotos  String[]
-  description     String
-  price           String?
-  currency        FiatAsset?
-  isActive        Boolean
-  order           Order?            @relation(fields: [orderId], references: [id])
-  orderId         String?           @db.ObjectId
-  BucketCarCard   BucketCarCard[]
-  WishlistCarCard WishlistCarCard[]
+  id             String          @id @default(auto()) @map("_id") @db.ObjectId
+  externalId     String?         @unique
+  inStock        Boolean         @default(false)
+  specifications Specification[]
+  photos         File[]
+  importedPhotos String[]
+  description    String
+  price          String?
+  currency       FiatAsset?
+  isActive       Boolean
+  BucketCarCard  BucketCarCard[]
+  orderIds       String[]        @db.ObjectId
+  orders         Order[]         @relation(fields: [orderIds], references: [id])
+  wishlistIds    String[]        @db.ObjectId
+  wishlists      Wishlist[]      @relation(fields: [wishlistIds], references: [id])
 }
 
 model File {
@@ -100,12 +101,14 @@ model File {
 }
 
 model Order {
-  id        String    @id @default(auto()) @map("_id") @db.ObjectId
-  carCards  CarCard[]
-  user      User      @relation("Client", fields: [userId], references: [id])
-  userId    String    @db.ObjectId
-  manager   User?     @relation("Manager", fields: [userId], references: [id])
-  managerId String?
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  user       User      @relation("Client", fields: [userId], references: [id])
+  userId     String    @db.ObjectId
+  manager    User?     @relation("Manager", fields: [userId], references: [id])
+  managerId  String?
+  carCardIds String[]  @db.ObjectId
+  carCards   CarCard[] @relation(fields: [carCardIds], references: [id])
+  messageId  String?
 }
 
 model Bucket {
@@ -128,20 +131,11 @@ model BucketCarCard {
 }
 
 model Wishlist {
-  id              String            @id @default(auto()) @map("_id") @db.ObjectId
-  userId          String            @unique @db.ObjectId
-  user            User              @relation(fields: [userId], references: [id])
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
-  WishlistCarCard WishlistCarCard[]
-}
-
-model WishlistCarCard {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  wishlistId String   @db.ObjectId
-  wishlist   Wishlist @relation(fields: [wishlistId], references: [id])
-  carCardId  String   @db.ObjectId
-  carCard    CarCard  @relation(fields: [carCardId], references: [id])
-  addedAt    DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId     String    @unique @db.ObjectId
+  user       User      @relation(fields: [userId], references: [id])
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  carCardIds String[]  @db.ObjectId
+  carCards   CarCard[] @relation(fields: [carCardIds], references: [id])
 }

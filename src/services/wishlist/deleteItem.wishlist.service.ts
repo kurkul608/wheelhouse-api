@@ -5,27 +5,33 @@ export async function deleteItemFromWishlist(
   carCardId: string,
 ) {
   try {
-    const wishlist = await prisma.wishlist.findUnique({
-      where: { userId },
-    });
+    const [wishlist, carCard] = await Promise.all([
+      prisma.wishlist.findUnique({ where: { userId } }),
+      prisma.carCard.findUnique({ where: { id: carCardId } }),
+    ]);
 
     if (!wishlist) {
       throw new Error("wishlist not found for this user");
     }
 
-    const wishlistCarCardExist = await prisma.wishlistCarCard.findFirst({
-      where: { carCardId, wishlistId: wishlist.id },
-    });
-
-    if (!wishlistCarCardExist) {
-      throw new Error("CarCard is not in the wishlist");
+    if (!carCard) {
+      throw new Error(`CarCard с ID ${carCardId} не найден`);
     }
 
-    await prisma.wishlistCarCard.delete({
-      where: { id: wishlistCarCardExist.id },
+    if (!wishlist.carCardIds.some((id) => id === carCardId)) {
+      throw new Error("CarCard is not wishlist");
+    }
+
+    const updatedWishlist = await prisma.wishlist.update({
+      where: { userId },
+      data: {
+        carCardIds: {
+          set: wishlist.carCardIds.filter((id) => id !== carCardId),
+        },
+      },
     });
 
-    return true;
+    return updatedWishlist;
   } catch (error) {
     console.error("Error deleting item to wishlist:", error);
     throw error;

@@ -14,6 +14,7 @@ export async function userRoutes(fastify: FastifyInstance) {
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
         const userTgId = getIdByToken(request.headers.authorization || "");
+        console.log(userTgId);
         const existUser = await getByTgIdUserService(userTgId);
 
         if (existUser) {
