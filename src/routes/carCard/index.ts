@@ -39,10 +39,8 @@ export async function carCardRoutes(fastify: FastifyInstance) {
         if (!carCardsStockFilterEnum.includes(stockFilter)) {
           return reply.status(400).send({ error: "Invalid stockFilter value" });
         }
-        console.log(stockFilter);
         const inStock: boolean | undefined =
           stockFilter !== "all" ? stockFilter === "inStock" : undefined;
-        console.log(inStock);
 
         const { limit = 10, offset = 0 } = request.query as GetCarCardListQuery;
         const carCards = await getListCarCardService({

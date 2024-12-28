@@ -25,7 +25,7 @@ bot.command("start", async (ctx) => {
 
   const keyboard = new InlineKeyboard().webApp(
     "Some web app",
-    "http://zzz.com:3000",
+    process.env.MINI_APP_URL || "",
   );
   await ctx.reply("Button", { reply_markup: keyboard });
 });
