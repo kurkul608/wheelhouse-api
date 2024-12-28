@@ -3,6 +3,8 @@ import { getListCarCardService } from "../../services/carCard/getList.carCard.se
 import { getCarCardService } from "../../services/carCard/get.carCard.service";
 import { authMiddleware } from "../../middlewares/authMiddleware";
 import { isBooleanObject } from "node:util/types";
+import { createCarService } from "../../services/carCard/create.carCard.service";
+import { parseFiatAsset } from "../../utils/parseFiatAsset";
 
 const carCardsStockFilterEnum = ["all", "inStock", "onOrder"] as const;
 type CarCardsStockFilter = (typeof carCardsStockFilterEnum)[number];
@@ -15,6 +17,14 @@ interface GetCarCardListQuery {
   limit: number;
   offset: number;
   stockFilter: CarCardsStockFilter;
+}
+
+interface CreateCarCardBody {
+  inStock: boolean;
+  description: string;
+  price?: string;
+  currency?: string;
+  isActive: boolean;
 }
 
 export async function carCardRoutes(fastify: FastifyInstance) {
@@ -76,6 +86,45 @@ export async function carCardRoutes(fastify: FastifyInstance) {
       } catch (error) {
         console.error("Error get cars card:", error);
         reply.status(500).send({ error: "Unable to get cars card" });
+      }
+    },
+  );
+  fastify.post(
+    "/cars",
+    {
+      preHandler: authMiddleware,
+      schema: {
+        body: {
+          type: "object",
+          properties: {
+            inStock: { type: "boolean" },
+            description: { type: "string" },
+            price: { type: "string" },
+            currency: { type: "string" },
+            isActive: { type: "boolean" },
+          },
+          required: ["inStock", "description", "isActive"],
+        },
+      },
+    },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      // fastify.addHook("preHandler", authMiddleware);
+
+      try {
+        const { inStock, currency, description, isActive, price } =
+          request.body as CreateCarCardBody;
+
+        const carCard = await createCarService({
+          inStock,
+          currency: currency ? parseFiatAsset(currency) : null,
+          description,
+          isActive,
+          price,
+        });
+        reply.status(200).send(carCard);
+      } catch (error) {
+        console.error("Error create car card: ", error);
+        reply.status(500).send({ error: "Unable to create car card" });
       }
     },
   );

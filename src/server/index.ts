@@ -2,11 +2,12 @@ import fastify from "fastify";
 import fastifyCors from "@fastify/cors";
 import fastifyAxios from "fastify-axios";
 import { carCardRoutes } from "../routes/carCard";
-import { authMiddleware } from "../middlewares/authMiddleware";
 import { userRoutes } from "../routes/user";
 import { bucketRoutes } from "../routes/bucket";
 import { wishlistRoutes } from "../routes/wishlist";
 import { orderRoutes } from "../routes/oreder";
+import { fileRoutes } from "../routes/file";
+import multer from "fastify-multer";
 
 export const server = fastify({ logger: true });
 
@@ -34,3 +35,4 @@ server.register(userRoutes);
 server.register(bucketRoutes);
 server.register(wishlistRoutes);
 server.register(orderRoutes);
+server.register(fileRoutes);
