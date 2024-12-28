@@ -3,6 +3,8 @@ import { getByExternalIdCarCardService } from "../../carCard/getByExternalId.car
 import { createCarService } from "../../carCard/create.carCard.service";
 import { FiatAsset } from "@prisma/client";
 import { createManySpecificationService } from "../../specification/createMany.specification.service";
+import { setDisableManyCarCardService } from "../../carCard/setDisableMany.carCard.service";
+import { parseFiatAsset } from "../../../utils/parseFiatAsset";
 
 export interface WeltCarData {
   id: string;
@@ -28,16 +30,17 @@ export const getAndSaveWeltCarData = async () => {
     await server.axios.clientWeltCar.get<WeltCarData[]>(WELT_CAR_DATA_PATH)
   ).data;
   server.log.info(`Data loaded. Total cars: ${weltCarData.length}`);
+  const externalIds: string[] = [];
   for (const weltCar of weltCarData) {
     const externalId = `weltcar-${weltCar.id}`;
+    externalIds.push(externalId);
     const extendCarCard = await getByExternalIdCarCardService(externalId);
     if (extendCarCard) {
       continue;
     }
 
     const carCard = await createCarService({
-      // TODO Добавить функцию, которая будет приводить строку к FiatAsset
-      currency: weltCar.currency as FiatAsset,
+      currency: parseFiatAsset(weltCar.currency),
       description: weltCar.description,
       isActive: true,
       inStock: false,
@@ -85,5 +88,9 @@ export const getAndSaveWeltCarData = async () => {
       },
     ]);
   }
+  server.log.info("Start disable car cards");
+
+  await setDisableManyCarCardService(externalIds);
+
   server.log.info("Import weltcar data finished");
 };

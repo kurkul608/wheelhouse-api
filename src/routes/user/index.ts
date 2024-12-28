@@ -13,7 +13,6 @@ export async function userRoutes(fastify: FastifyInstance) {
     "/users/register",
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        // const body = request.body as IRegisterUserBody;
         const userTgId = getIdByToken(request.headers.authorization || "");
         const existUser = await getByTgIdUserService(userTgId);
 
