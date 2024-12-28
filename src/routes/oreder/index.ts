@@ -3,6 +3,8 @@ import { authMiddleware } from "../../middlewares/authMiddleware";
 import { getIdByToken } from "../../utils/auth";
 import { getByTgIdUserService } from "../../services/user/getByTgId.user.service";
 import { createOrder } from "../../services/order/create.order";
+import { sendOrderMessageBotService } from "../../services/bot/sendOrderMessage.bot.service";
+import { addMessageOrderService } from "../../services/order/addMessage.order.service";
 
 export async function orderRoutes(fastify: FastifyInstance) {
   fastify.addHook("preHandler", authMiddleware);
@@ -30,6 +32,9 @@ export async function orderRoutes(fastify: FastifyInstance) {
       }
 
       const order = await createOrder(carId, existUser.id);
+
+      const message = await sendOrderMessageBotService(order.id);
+      await addMessageOrderService(order.id, String(message.message_id));
 
       return reply.status(201).send(order);
     },
