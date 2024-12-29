@@ -8,6 +8,7 @@ import { wishlistRoutes } from "../routes/wishlist";
 import { orderRoutes } from "../routes/oreder";
 import { fileRoutes } from "../routes/file";
 import multer from "fastify-multer";
+import { managerCarsRoutes } from "../routes/manager/cars";
 
 export const server = fastify({ logger: true });
 
@@ -36,3 +37,4 @@ server.register(bucketRoutes);
 server.register(wishlistRoutes);
 server.register(orderRoutes);
 server.register(fileRoutes);
+server.register(managerCarsRoutes);

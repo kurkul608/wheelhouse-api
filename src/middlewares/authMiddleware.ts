@@ -4,16 +4,15 @@ import crypto from "crypto";
 
 export async function authMiddleware(req: FastifyRequest, reply: FastifyReply) {
   const token = req.headers.authorization;
-  console.log(token);
-  const publicRoutes = ["/pay"];
-  if (publicRoutes.includes(req.url)) {
-    return;
-  }
+  // const publicRoutes = ["/pay"];
+  // if (publicRoutes.includes(req.url)) {
+  //   return;
+  // }
 
   if (token && validateTelegramData(token)) {
-    return; // Если проверка прошла, продолжаем выполнение запроса
+    return;
   } else {
-    reply.status(401).send({ message: "Unauthorized" }); // Возвращаем ошибку "Unauthorized"
+    reply.status(401).send({ message: "Unauthorized" });
   }
 }
 
