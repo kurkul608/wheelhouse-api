@@ -29,7 +29,7 @@ export const sendOrderMessageBotService = async (orderId: string) => {
       "Поступила новая заявка\n\nСписок автомобилей находится ниже\n\nЧтобы получить детали о данных пользователя - необходимо принять заявку!";
 
     const message = await bot.api.sendMessage(
-      process.env.SERVICE_CHAT || "",
+      process.env.MANAGER_CHAT || "",
       text,
       {
         reply_markup: inlineButtons,
