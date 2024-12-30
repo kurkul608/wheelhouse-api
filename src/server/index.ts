@@ -9,6 +9,7 @@ import { orderRoutes } from "../routes/oreder";
 import { fileRoutes } from "../routes/file";
 import multer from "fastify-multer";
 import { managerCarsRoutes } from "../routes/manager/cars";
+import { managerSpecificationRoutes } from "../routes/manager/specification";
 
 export const server = fastify({ logger: true });
 
@@ -38,3 +39,4 @@ server.register(wishlistRoutes);
 server.register(orderRoutes);
 server.register(fileRoutes);
 server.register(managerCarsRoutes);
+server.register(managerSpecificationRoutes);
