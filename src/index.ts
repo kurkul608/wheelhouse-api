@@ -22,6 +22,7 @@ server.listen(
       console.error(err);
       process.exit(1);
     }
+    console.log(process.env);
     console.log(`Server listening at ${address}`);
   },
 );
