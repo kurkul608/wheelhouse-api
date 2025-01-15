@@ -36,7 +36,7 @@ export async function managerSpecificationRoutes(fastify: FastifyInstance) {
 
         const specifications = await createManySpecificationService(data);
 
-        reply.status(200).send("success");
+        reply.status(200).send({ message: "success" });
       } catch (error) {
         console.error("Error create car card: ", error);
         reply.status(500).send({ error: "Unable to create car card" });

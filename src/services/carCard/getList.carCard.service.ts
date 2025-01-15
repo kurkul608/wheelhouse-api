@@ -13,6 +13,7 @@ export const getListCarCardService = async ({
     skip: offset,
     take: limit,
     include: {
+      photos: true,
       specifications: { select: { field: true, fieldName: true, value: true } },
     },
     where: {
@@ -20,6 +21,5 @@ export const getListCarCardService = async ({
       inStock,
     },
   });
-  console.log(carCards.length);
   return carCards;
 };

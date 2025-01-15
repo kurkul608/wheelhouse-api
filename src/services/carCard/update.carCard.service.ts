@@ -4,7 +4,7 @@ import { Prisma } from "@prisma/client";
 export const updateCarCardService = async (
   carCarId: string,
   data: Prisma.CarCardUpdateInput,
-) => {
+): Promise<Prisma.CarCardGetPayload<any> | null> => {
   try {
     await prisma.carCard.update({ where: { id: carCarId }, data: data });
 

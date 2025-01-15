@@ -1,12 +1,12 @@
 import prisma from "../../../prisma";
 
 export const getListManagerCarService = async (
-  inStock: boolean,
+  inStock?: boolean,
   isActive?: boolean,
 ) => {
   try {
     const cars = await prisma.carCard.findMany({
-      include: { specifications: true },
+      include: { specifications: true, photos: true },
       where: {
         inStock,
         isActive,

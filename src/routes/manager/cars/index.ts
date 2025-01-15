@@ -93,7 +93,7 @@ export async function managerCarsRoutes(fastify: FastifyInstance) {
       const isActive: boolean | undefined =
         activeFilter === "all" ? undefined : activeFilter === "active";
 
-      const cars = await getListManagerCarService(!!inStock, isActive);
+      const cars = await getListManagerCarService(inStock, isActive);
 
       reply.status(200).send(cars);
     },

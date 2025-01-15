@@ -12,7 +12,7 @@ import { sendNotificationToUserBotService } from "../services/bot/sendNotificati
 dotenv.config();
 
 export const bot = new Bot(process.env.BOT_TOKEN || "", {
-  client: { environment: "test" },
+  client: { environment: process.env.LOCAL ? "test" : "prod" },
 });
 
 bot.command("start", async (ctx) => {
