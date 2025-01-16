@@ -10,6 +10,8 @@ COPY . .
 
 RUN yarn setup-build
 
+RUN yarn install -g prisma
+
 RUN npx prisma generate
 
 EXPOSE 8080
