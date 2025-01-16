@@ -8,9 +8,11 @@ RUN yarn install
 
 RUN npm install -g prisma
 
+COPY . .
+
 RUN npx prisma generate
 
-COPY . .
+
 
 RUN yarn setup-build
 
