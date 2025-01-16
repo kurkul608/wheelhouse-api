@@ -16,6 +16,7 @@ export const bot = new Bot(process.env.BOT_TOKEN || "", {
 });
 
 bot.command("start", async (ctx) => {
+  console.log("start command");
   const existUser = await getByTgIdUserService(ctx.from!.id);
   if (!existUser) {
     await createUserService({
