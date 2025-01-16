@@ -4,7 +4,7 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "setup-build": "yarn install && prisma generate && yarn build",
+    "setup-build": "yarn install && yarn build",
     "build": "tsc -p tsconfig.json",
     "dev": "nodemon src/index.ts",
     "start": "node dist/index.js"

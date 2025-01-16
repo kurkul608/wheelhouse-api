@@ -10,6 +10,8 @@ COPY . .
 
 RUN yarn setup-build
 
+RUN npx prisma generate
+
 EXPOSE 8080
 
-CMD ["sh", "-c", "npx prisma generate && yarn build && yarn start"]
+CMD ["sh", "-c", "yarn start"]
