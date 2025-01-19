@@ -17,23 +17,28 @@ export const bot = new Bot(process.env.BOT_TOKEN || "", {
 
 bot.command("start", async (ctx) => {
   console.log("start command");
-  const existUser = await getByTgIdUserService(ctx.from!.id);
-  if (!existUser) {
-    await createUserService({
-      tgId: ctx.from!.id,
-      username: ctx.from?.username,
-      firstName: ctx.from?.first_name,
-      lastName: ctx.from?.last_name,
-      languageCode: ctx.from?.language_code,
-      roles: [UserRole.USER],
-    });
-  }
+  try {
+    const existUser = await getByTgIdUserService(ctx.from!.id);
+    if (!existUser) {
+      await createUserService({
+        tgId: ctx.from!.id,
+        username: ctx.from?.username,
+        firstName: ctx.from?.first_name,
+        lastName: ctx.from?.last_name,
+        languageCode: ctx.from?.language_code,
+        roles: [UserRole.USER],
+      });
+    }
 
-  const keyboard = new InlineKeyboard().webApp(
-    "Some web app",
-    process.env.MINI_APP_URL || "",
-  );
-  await ctx.reply("Button", { reply_markup: keyboard });
+    const keyboard = new InlineKeyboard().webApp(
+      "Some web app",
+      process.env.MINI_APP_URL || "",
+    );
+    await ctx.reply("Button", { reply_markup: keyboard });
+  } catch (error) {
+    console.error(error);
+    await ctx.reply("Произошла ошибка");
+  }
 });
 
 bot.on("callback_query:data", async (ctx) => {
