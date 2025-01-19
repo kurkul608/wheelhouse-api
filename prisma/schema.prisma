@@ -10,7 +10,7 @@ generator client {
 
 datasource db {
   provider = "mongodb"
-  url      = env("mongodb://root:prisma@localhost:27017/mydatabase?authSource=admin")
+  url      = env("DATABASE_URL")
 }
 
 enum UserRole {
