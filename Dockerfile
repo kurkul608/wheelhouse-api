@@ -19,4 +19,4 @@ RUN yarn build
 
 EXPOSE 8080
 
-CMD ["sh", "-c", "yarn start"]
+CMD ["sh", "-c", "npx prisma db push && yarn start"]
