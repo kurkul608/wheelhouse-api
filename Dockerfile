@@ -12,10 +12,10 @@ COPY . .
 
 RUN npx prisma generate
 
-RUN npx prisma db push
+RUN #npx prisma db push
 
 RUN yarn setup-build
 
 EXPOSE 8080
 
-CMD ["sh", "-c", "yarn start"]
+CMD ["sh", "-c", "npx prisma db push && yarn start"]
