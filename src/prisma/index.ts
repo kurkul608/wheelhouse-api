@@ -1,5 +1,6 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from "@prisma/client";
 
- const prisma = new PrismaClient()
+console.log(process.env.DATABASE_URL);
+const prisma = new PrismaClient();
 
-export default prisma
+export default prisma;
