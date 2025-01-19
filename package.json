@@ -4,10 +4,10 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "setup-build": "yarn install && yarn build",
     "build": "tsc -p tsconfig.json",
     "dev": "nodemon src/index.ts",
-    "start": "node dist/index.js"
+    "start": "yarn db:sync && node dist/index.js",
+    "db:sync": "prisma db push"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.717.0",
