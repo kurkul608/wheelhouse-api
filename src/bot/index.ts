@@ -31,7 +31,7 @@ bot.command("start", async (ctx) => {
     }
 
     const keyboard = new InlineKeyboard().webApp(
-      "Some web app",
+      "Каталог Zeuese",
       process.env.MINI_APP_URL || "",
     );
     await ctx.reply("Button", { reply_markup: keyboard });
