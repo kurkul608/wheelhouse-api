@@ -12,7 +12,7 @@ COPY . .
 
 RUN npx prisma generate
 
-
+RUN npx prisma db push
 
 RUN yarn setup-build
 
