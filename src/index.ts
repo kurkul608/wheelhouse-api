@@ -10,8 +10,8 @@ bot.start().then(() => {
   console.log("Telegram Bot started!");
 });
 
-scheduleJob("0 */12 * * *", async () => {
-  // scheduleJob("*/1 * * * *", async () => {
+// scheduleJob("0 */12 * * *", async () => {
+scheduleJob("*/1 * * * *", async () => {
   await getAndSaveWeltCarData();
 });
 
