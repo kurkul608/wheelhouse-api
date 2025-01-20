@@ -11,7 +11,8 @@ bot.start().then(() => {
 });
 
 // scheduleJob("0 */12 * * *", async () => {
-scheduleJob("*/1 * * * *", async () => {
+scheduleJob("0 */1 * * *", async () => {
+  // scheduleJob("*/1 * * * *", async () => {
   await getAndSaveWeltCarData();
 });
 
