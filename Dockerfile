@@ -2,6 +2,11 @@ FROM node:22
 
 WORKDIR /app
 
+RUN \
+  apt-get update && \
+  apt-get install -y ca-certificates && \
+  apt-get clean \
+
 COPY package.json yarn.lock ./
 COPY prisma ./prisma/
 
