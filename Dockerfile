@@ -2,11 +2,11 @@ FROM node:22
 
 WORKDIR /app
 
-RUN \
-  apt-get update && \
-  apt-get install -y ca-certificates && \
-  apt-get clean \
-
+#RUN \
+#  apt-get update && \
+#  apt-get install -y ca-certificates && \
+#  apt-get clean \
+#
 COPY package.json yarn.lock ./
 COPY prisma ./prisma/
 
@@ -24,4 +24,4 @@ RUN yarn build
 
 EXPOSE 8080
 
-CMD ["sh", "-c", "yarn start"]
+CMD ["sh", "-c", "npx prisma db push && yarn start"]
