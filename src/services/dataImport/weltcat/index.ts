@@ -4,6 +4,7 @@ import { createCarService } from "../../carCard/create.carCard.service";
 import { createManySpecificationService } from "../../specification/createMany.specification.service";
 import { setDisableManyCarCardService } from "../../carCard/setDisableMany.carCard.service";
 import { parseFiatAsset } from "../../../utils/parseFiatAsset";
+import { Agent } from "node:https";
 
 export interface WeltCarData {
   id: string;
@@ -27,7 +28,11 @@ export const getAndSaveWeltCarData = async () => {
 
   try {
     const weltCarData: WeltCarData[] = (
-      await server.axios.clientWeltCar.get<WeltCarData[]>(WELT_CAR_DATA_PATH)
+      await server.axios.clientWeltCar.get<WeltCarData[]>(WELT_CAR_DATA_PATH, {
+        httpsAgent: new Agent({
+          rejectUnauthorized: false,
+        }),
+      })
     ).data;
     server.log.info(`Data loaded. Total cars: ${weltCarData.length}`);
     const externalIds: string[] = [];
