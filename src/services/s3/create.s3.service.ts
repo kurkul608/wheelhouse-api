@@ -1,12 +1,11 @@
-import { PutObjectRequest } from "aws-sdk/clients/s3";
+import { PutObjectCommand, ListObjectsV2Command } from "@aws-sdk/client-s3";
 import { s3Client } from "../../s3";
 import path from "node:path";
 import * as fs from "node:fs";
 
-export const createS3Service = async (uploadParams: PutObjectRequest) => {
+export const createS3Service = async (uploadParams: PutObjectCommand) => {
   try {
-    console.log(uploadParams);
-    const upld = await s3Client.upload(uploadParams);
+    const upld = await s3Client.send(uploadParams);
     console.log("upload data: ", upld);
     return "File uploaded successfully";
   } catch (error) {
@@ -19,7 +18,9 @@ export const getElements = async () => {
     Bucket: process.env.S3_BUCKET ?? "",
   };
 
-  const result = await s3Client.listObjectsV2(params).promise();
+  const result = await s3Client.send(
+    new ListObjectsV2Command({ Bucket: process.env.S3_BUCKET ?? "" }),
+  );
 
   if (!result.Contents) {
     return [];
@@ -35,14 +36,14 @@ export const uploadFileToS3 = async () => {
     const fileStream = fs.createReadStream(filePath);
     const fileName = "TEST_PHOTO.jpg";
 
-    const uploadParams: PutObjectRequest = {
+    const uploadParams: PutObjectCommand = new PutObjectCommand({
       Body: fileStream,
       ContentType: "image/jpeg", // Указание типа контента
       Bucket: process.env.S3_BUCKET ?? "",
       Key: `${fileName}`,
       // Body: await file.toBuffer(),
       // ContentType: fileStream.mimetype,
-    };
+    });
 
     const response = await createS3Service(uploadParams);
     // console.log(response);

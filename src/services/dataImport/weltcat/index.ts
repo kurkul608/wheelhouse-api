@@ -21,6 +21,7 @@ export interface WeltCarData {
   color_int_simple: string;
   description: string;
 }
+// https://api.weltcar.de/api/cars/list/json
 export const WELT_CAR_DATA_PATH = "cars/list/json";
 
 export const getAndSaveWeltCarData = async () => {

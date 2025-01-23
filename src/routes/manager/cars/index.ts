@@ -6,6 +6,7 @@ import { getListManagerCarService } from "../../../services/manager/car/getList.
 import { createCarService } from "../../../services/carCard/create.carCard.service";
 import { parseFiatAsset } from "../../../utils/parseFiatAsset";
 import { updateCarCardService } from "../../../services/carCard/update.carCard.service";
+import { removePhotoFromCarCard } from "../../../services/carCard/removePhotoFromCarCard";
 
 export const carCardsActiveFilterEnum = ["all", "active", "disabled"] as const;
 export type CarCardsActiveFilter = (typeof carCardsActiveFilterEnum)[number];
@@ -16,6 +17,11 @@ interface CreateCarCardBody {
   price?: string;
   currency?: string;
   isActive: boolean;
+}
+
+interface DeleteCarCardFileParams {
+  carId: string;
+  fileId: string;
 }
 
 export async function managerCarsRoutes(fastify: FastifyInstance) {
@@ -133,6 +139,31 @@ export async function managerCarsRoutes(fastify: FastifyInstance) {
       });
 
       reply.status(200).send(carCard);
+    },
+  );
+  fastify.delete(
+    "/manager/cars/:carId/file/:fileId",
+    {
+      schema: {
+        params: {
+          type: "object",
+          properties: {
+            carId: { type: "string" },
+            fileId: { type: "string" },
+          },
+          required: ["carId", "fileId"],
+        },
+      },
+    },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      try {
+        const { carId, fileId } = request.params as DeleteCarCardFileParams;
+        const response = await removePhotoFromCarCard(carId, fileId);
+        reply.status(200).send(response);
+      } catch (error) {
+        console.error("Error delete file from card:", error);
+        reply.status(500).send({ error: "Unable to delete file" });
+      }
     },
   );
 }

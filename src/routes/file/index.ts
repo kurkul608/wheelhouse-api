@@ -1,19 +1,16 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-import multer from "fastify-multer";
 import fastifyMultipart from "@fastify/multipart";
-import { s3Client } from "../../s3";
 import {
   createS3Service,
   getElements,
-  uploadFileToS3,
 } from "../../services/s3/create.s3.service";
 import { createFileService } from "../../services/file/create.file.service";
 import { authMiddleware } from "../../middlewares/authMiddleware";
-import { PutObjectRequest } from "aws-sdk/clients/s3";
 import { updateFileService } from "../../services/file/update.file.service";
 import { getCarCardService } from "../../services/carCard/get.carCard.service";
 import { Prisma } from "@prisma/client";
 import { managerMiddleware } from "../../middlewares/managerMiddleware";
+import { PutObjectCommand, PutObjectRequest } from "@aws-sdk/client-s3";
 
 // interface FileRequest extends FastifyRequest {
 //   file?: {
@@ -48,12 +45,12 @@ export async function fileRoutes(fastify: FastifyInstance) {
 
     const fileName = `${Date.now()}-${file.filename}`;
 
-    const uploadParams: PutObjectRequest = {
+    const uploadParams: PutObjectCommand = new PutObjectCommand({
       Bucket: process.env.S3_BUCKET || "",
       Key: `uploads/${fileName}`,
       Body: await file.toBuffer(),
       ContentType: file.mimetype,
-    };
+    });
 
     // await uploadFileToS3();
 
@@ -66,8 +63,8 @@ export async function fileRoutes(fastify: FastifyInstance) {
 
     const fileModel = await createFileService({
       file_size: file.file.bytesRead,
-      key: uploadParams.Key ?? "",
-      bucket: uploadParams.Bucket ?? "",
+      key: uploadParams.input.Key ?? "",
+      bucket: uploadParams.input.Bucket ?? "",
       domain: process.env.S3_DOMAIN ?? "",
     });
 
