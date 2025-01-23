@@ -4,6 +4,7 @@ import { managerMiddleware } from "../../../middlewares/managerMiddleware";
 import { createManySpecificationService } from "../../../services/specification/createMany.specification.service";
 import { createSpecificationService } from "../../../services/specification/create.specification.service";
 import { Prisma } from "@prisma/client";
+import { deleteSpecificationService } from "../../../services/specification/delete.specification.service";
 
 interface CreateSpecificationBody {
   value: string;
@@ -47,6 +48,29 @@ export async function managerSpecificationRoutes(fastify: FastifyInstance) {
       } catch (error) {
         console.error("Error create car card: ", error);
         reply.status(500).send({ error: "Unable to create car card" });
+      }
+    },
+  );
+  fastify.delete(
+    "/manager/specifications/:specificationId",
+    {
+      schema: {
+        params: {
+          type: "object",
+          properties: { specificationId: { type: "string" } },
+          required: ["specificationId"],
+        },
+      },
+    },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      try {
+        const { specificationId } = request.params as {
+          specificationId: string;
+        };
+        const res = await deleteSpecificationService(specificationId);
+        return reply.status(200).send(res);
+      } catch (error) {
+        return reply.status(500).send({ error: "Unable to delete car card" });
       }
     },
   );

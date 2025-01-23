@@ -8,7 +8,9 @@ export const getCarCardService = async (
     where: { id },
     include: {
       photos: true,
-      specifications: { select: { field: true, fieldName: true, value: true } },
+      specifications: {
+        select: { field: true, fieldName: true, value: true, id: true },
+      },
     },
   });
   return carCard;
