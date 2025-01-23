@@ -41,6 +41,7 @@ model Specification {
   field     String
   fieldName String
   value     String
+  colorHex  String?
   carCard   CarCard  @relation(fields: [carCardId], references: [id])
   carCardId String   @db.ObjectId
   createdAt DateTime @default(now())

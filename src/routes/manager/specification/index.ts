@@ -2,6 +2,8 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { authMiddleware } from "../../../middlewares/authMiddleware";
 import { managerMiddleware } from "../../../middlewares/managerMiddleware";
 import { createManySpecificationService } from "../../../services/specification/createMany.specification.service";
+import { createSpecificationService } from "../../../services/specification/create.specification.service";
+import { Prisma } from "@prisma/client";
 
 interface CreateSpecificationBody {
   value: string;
@@ -19,7 +21,7 @@ export async function managerSpecificationRoutes(fastify: FastifyInstance) {
     {
       schema: {
         body: {
-          type: "array",
+          type: "object",
           properties: {
             value: { type: "string" },
             field: { type: "string" },
@@ -32,11 +34,16 @@ export async function managerSpecificationRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        const data = request.body as CreateSpecificationBody[];
+        const data = request.body as CreateSpecificationBody;
 
-        const specifications = await createManySpecificationService(data);
+        const specification = await createSpecificationService({
+          field: data.field,
+          fieldName: data.fieldName,
+          value: data.value,
+          carCardId: data.carCardId,
+        } as unknown as Prisma.SpecificationCreateInput);
 
-        reply.status(200).send({ message: "success" });
+        reply.status(201).send(specification);
       } catch (error) {
         console.error("Error create car card: ", error);
         reply.status(500).send({ error: "Unable to create car card" });
