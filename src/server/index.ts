@@ -10,6 +10,7 @@ import { fileRoutes } from "../routes/file";
 import multer from "fastify-multer";
 import { managerCarsRoutes } from "../routes/manager/cars";
 import { managerSpecificationRoutes } from "../routes/manager/specification";
+import { adminUsersRoutes } from "../routes/admin/users";
 
 export const server = fastify({ logger: true });
 
@@ -40,3 +41,4 @@ server.register(orderRoutes);
 server.register(fileRoutes);
 server.register(managerCarsRoutes);
 server.register(managerSpecificationRoutes);
+server.register(adminUsersRoutes);
