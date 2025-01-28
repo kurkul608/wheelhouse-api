@@ -11,7 +11,11 @@ export async function adminMiddleware(
   const userTgId = getIdByToken(req.headers.authorization || "");
   const user = await getByTgIdUserService(userTgId);
 
-  if (user?.roles.some((role) => role.includes("ADMIN"))) {
+  if (
+    user?.roles.some(
+      (role) => role.includes("ADMIN") || role.includes("SUPER_ADMIN"),
+    )
+  ) {
     return;
   } else {
     reply.status(403).send({ message: "Only for admins" });
