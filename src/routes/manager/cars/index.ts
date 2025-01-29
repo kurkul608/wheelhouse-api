@@ -74,6 +74,7 @@ export async function managerCarsRoutes(fastify: FastifyInstance) {
           properties: {
             limit: { type: "number" },
             offset: { type: "number" },
+            search: { type: "string" },
             stockFilter: { type: "string", enum: carCardsStockFilterEnum },
             activeFilter: { type: "string", enum: carCardsActiveFilterEnum },
           },
@@ -82,9 +83,10 @@ export async function managerCarsRoutes(fastify: FastifyInstance) {
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const { stockFilter, activeFilter } = request.query as {
+      const { stockFilter, activeFilter, search } = request.query as {
         stockFilter: CarCardsStockFilter;
         activeFilter: CarCardsActiveFilter;
+        search: string;
       };
       if (!carCardsStockFilterEnum.includes(stockFilter)) {
         return reply.status(400).send({ error: "Invalid stockFilter value" });
@@ -99,7 +101,11 @@ export async function managerCarsRoutes(fastify: FastifyInstance) {
       const isActive: boolean | undefined =
         activeFilter === "all" ? undefined : activeFilter === "active";
 
-      const cars = await getListManagerCarService(inStock, isActive);
+      const cars = await getListManagerCarService({
+        inStock,
+        isActive,
+        searchString: search,
+      });
 
       reply.status(200).send(cars);
     },
