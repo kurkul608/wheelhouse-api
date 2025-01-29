@@ -25,7 +25,6 @@ export interface WeltCarData {
 const BATCH_SIZE = 3;
 const DELAY_MS = 20_000;
 
-// https://api.weltcar.de/api/cars/list/json
 export const WELT_CAR_DATA_PATH = "cars/list/json";
 
 export const getAndSaveWeltCarData = async () => {
@@ -52,26 +51,40 @@ export const getAndSaveWeltCarData = async () => {
 
       await Promise.all(
         batch.map(async (weltCar) => {
-          const externalId = `weltcar-${weltCar.id}`;
-          externalIds.push(externalId);
-          const extendCarCard = await getByExternalIdCarCardService(externalId);
-          if (extendCarCard) return;
+          try {
+            const externalId = `weltcar-${weltCar.id}`;
+            externalIds.push(externalId);
+            const extendCarCard =
+              await getByExternalIdCarCardService(externalId);
+            if (extendCarCard) return;
 
-          const specs = await generateCarOpenaiService(JSON.stringify(weltCar));
+            let specs = null;
+            try {
+              specs = await generateCarOpenaiService(JSON.stringify(weltCar));
+            } catch (openAiError) {
+              server.log.warn(
+                `OpenAI error for car ${externalId}: ${(openAiError as { message: string }).message}`,
+              );
+            }
 
-          const carCard = await createCarService({
-            currency: parseFiatAsset(weltCar.currency),
-            description: specs?.description || "",
-            isActive: true,
-            inStock: false,
-            importedPhotos: weltCar.media,
-            price: weltCar.price ? String(weltCar.price) : null,
-            externalId: externalId,
-          });
+            const carCard = await createCarService({
+              currency: parseFiatAsset(weltCar.currency),
+              description: specs?.description || "",
+              isActive: true,
+              inStock: false,
+              importedPhotos: weltCar.media,
+              price: weltCar.price ? String(weltCar.price) : null,
+              externalId: externalId,
+            });
 
-          if (specs?.data) {
-            await createManySpecificationService(
-              specs.data.map((spec) => ({ ...spec, carCardId: carCard.id })),
+            if (specs?.data) {
+              await createManySpecificationService(
+                specs.data.map((spec) => ({ ...spec, carCardId: carCard.id })),
+              );
+            }
+          } catch (error) {
+            server.log.error(
+              `Error processing car ${weltCar.id}: ${(error as { message: string }).message}`,
             );
           }
         }),
@@ -90,6 +103,8 @@ export const getAndSaveWeltCarData = async () => {
 
     server.log.info("Import weltcar data finished");
   } catch (error) {
-    server.log.error(error);
+    server.log.error(
+      `General error in import process: ${(error as { message: string }).message}`,
+    );
   }
 };
