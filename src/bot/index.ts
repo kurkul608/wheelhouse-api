@@ -8,6 +8,7 @@ import { addManagerOrderService } from "../services/order/addManager.order.servi
 import { generateUserLink } from "../utils/generateUserLink";
 import { getMiniAppLink } from "../utils/getMiniAppLink";
 import { sendNotificationToUserBotService } from "../services/bot/sendNotificationToUser.bot.service";
+import { getAndSaveWeltCarData } from "../services/dataImport/weltcat";
 
 dotenv.config();
 
@@ -16,7 +17,6 @@ export const bot = new Bot(process.env.BOT_TOKEN || "", {
 });
 
 bot.command("start", async (ctx) => {
-  console.log("start command");
   try {
     const existUser = await getByTgIdUserService(ctx.from!.id);
     if (!existUser) {
@@ -31,10 +31,28 @@ bot.command("start", async (ctx) => {
     }
 
     const keyboard = new InlineKeyboard().webApp(
-      "Каталог Zeuese",
+      "Каталог Zeuse",
       process.env.MINI_APP_URL || "",
     );
-    await ctx.reply("Button", { reply_markup: keyboard });
+    await ctx.reply("Посмотрите каталог Zeuse, нажав на кнопку снизу", {
+      reply_markup: keyboard,
+    });
+  } catch (error) {
+    console.error(error);
+    await ctx.reply("Произошла ошибка");
+  }
+});
+
+bot.command("import", async (ctx) => {
+  try {
+    const user = await getByTgIdUserService(ctx.from!.id);
+    if (!user || !user.roles.includes(UserRole.ADMIN)) {
+      await ctx.reply("У вас нет прав на импорт");
+      return;
+    }
+    await ctx.reply("Импорт начался...");
+    await getAndSaveWeltCarData();
+    await ctx.reply("Импорт завершен");
   } catch (error) {
     console.error(error);
     await ctx.reply("Произошла ошибка");

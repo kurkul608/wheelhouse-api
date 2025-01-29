@@ -3,6 +3,8 @@ import { bot } from "./bot";
 import { getAndSaveWeltCarData } from "./services/dataImport/weltcat";
 import { scheduleJob } from "node-schedule";
 import { server } from "./server";
+import { openaiClient } from "./openai";
+import { generateCarOpenaiService } from "./services/openai/generateCar.openai.service";
 
 dotenv.config();
 
@@ -12,7 +14,7 @@ bot.start().then(() => {
 
 scheduleJob("0 */12 * * *", async () => {
   // scheduleJob("0 */1 * * *", async () => {
-  // scheduleJob("*/5 * * * *", async () => {
+  // scheduleJob("*/1 * * * *", async () => {
   await getAndSaveWeltCarData();
 });
 
@@ -23,6 +25,7 @@ server.listen(
       console.error(err);
       process.exit(1);
     }
+    // getAndSaveWeltCarData();
     console.log(`Server listening at ${address}`);
   },
 );

@@ -5,6 +5,7 @@ import { createManySpecificationService } from "../../specification/createMany.s
 import { setDisableManyCarCardService } from "../../carCard/setDisableMany.carCard.service";
 import { parseFiatAsset } from "../../../utils/parseFiatAsset";
 import { Agent } from "node:https";
+import { generateCarOpenaiService } from "../../openai/generateCar.openai.service";
 
 export interface WeltCarData {
   id: string;
@@ -21,6 +22,9 @@ export interface WeltCarData {
   color_int_simple: string;
   description: string;
 }
+const BATCH_SIZE = 3;
+const DELAY_MS = 20_000;
+
 // https://api.weltcar.de/api/cars/list/json
 export const WELT_CAR_DATA_PATH = "cars/list/json";
 
@@ -28,71 +32,57 @@ export const getAndSaveWeltCarData = async () => {
   server.log.info("Import weltcar data starting...");
 
   try {
-    const weltCarData: WeltCarData[] = (
+    const data = (
       await server.axios.clientWeltCar.get<WeltCarData[]>(WELT_CAR_DATA_PATH, {
         httpsAgent: new Agent({
           rejectUnauthorized: false,
         }),
       })
     ).data;
+    const weltCarData: WeltCarData[] = process.env.LOCAL
+      ? data.slice(0, 7)
+      : data;
+
     server.log.info(`Data loaded. Total cars: ${weltCarData.length}`);
     const externalIds: string[] = [];
-    for (const weltCar of weltCarData) {
-      const externalId = `weltcar-${weltCar.id}`;
-      externalIds.push(externalId);
-      const extendCarCard = await getByExternalIdCarCardService(externalId);
-      if (extendCarCard) {
-        continue;
+    for (let i = 0; i < weltCarData.length; i += BATCH_SIZE) {
+      const batch = weltCarData.slice(i, i + BATCH_SIZE);
+
+      server.log.info(`Processing batch ${Math.floor(i / BATCH_SIZE) + 1}`);
+
+      await Promise.all(
+        batch.map(async (weltCar) => {
+          const externalId = `weltcar-${weltCar.id}`;
+          externalIds.push(externalId);
+          const extendCarCard = await getByExternalIdCarCardService(externalId);
+          if (extendCarCard) return;
+
+          const specs = await generateCarOpenaiService(JSON.stringify(weltCar));
+
+          const carCard = await createCarService({
+            currency: parseFiatAsset(weltCar.currency),
+            description: specs?.description || "",
+            isActive: true,
+            inStock: false,
+            importedPhotos: weltCar.media,
+            price: weltCar.price ? String(weltCar.price) : null,
+            externalId: externalId,
+          });
+
+          if (specs?.data) {
+            await createManySpecificationService(
+              specs.data.map((spec) => ({ ...spec, carCardId: carCard.id })),
+            );
+          }
+        }),
+      );
+
+      if (i + BATCH_SIZE < weltCarData.length) {
+        server.log.info(
+          `Waiting ${DELAY_MS / 1000} seconds before next batch...`,
+        );
+        await new Promise((resolve) => setTimeout(resolve, DELAY_MS));
       }
-
-      const carCard = await createCarService({
-        currency: parseFiatAsset(weltCar.currency),
-        description: weltCar.description,
-        isActive: true,
-        inStock: false,
-        importedPhotos: weltCar.media,
-        price: weltCar.price ? String(weltCar.price) : null,
-        externalId: externalId,
-      });
-
-      await createManySpecificationService([
-        {
-          carCardId: carCard.id,
-          value: weltCar.color_ext,
-          field: "color_ext",
-          fieldName: "Цвет экстерьера",
-        },
-        {
-          carCardId: carCard.id,
-          value: weltCar.color_int,
-          field: "color_int",
-          fieldName: "Цвет интерьера",
-        },
-        {
-          carCardId: carCard.id,
-          value: String(weltCar.year),
-          field: "year",
-          fieldName: "Год выпуска",
-        },
-        {
-          carCardId: carCard.id,
-          value: weltCar.vin,
-          field: "vin",
-          fieldName: "VIN номер",
-        },
-        {
-          carCardId: carCard.id,
-          value: weltCar.model,
-          field: "model",
-          fieldName: "Модель",
-        },
-        {
-          carCardId: carCard.id,
-          value: weltCar.specification,
-          field: "specification",
-          fieldName: "Спецификация",
-        },
-      ]);
     }
     server.log.info("Start disable car cards");
 
