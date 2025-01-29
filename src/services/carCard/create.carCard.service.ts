@@ -4,7 +4,9 @@ import prisma from "../../prisma";
 export const createCarService = async (
   carCardDto: Prisma.CarCardCreateInput,
 ): Promise<Prisma.CarCardGetPayload<any>> => {
-  const carCard = await prisma.carCard.create({ data: carCardDto });
+  const carCard = await prisma.carCard.create({
+    data: { ...carCardDto, externalId: undefined },
+  });
 
   return carCard;
 };
