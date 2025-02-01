@@ -3,7 +3,10 @@ import { getMiniAppLink } from "../../utils/getMiniAppLink";
 import { InlineKeyboard } from "grammy";
 import { bot } from "../../bot";
 
-export const sendOrderMessageBotService = async (orderId: string) => {
+export const sendOrderMessageBotService = async (
+  orderId: string,
+  isInquiresAboutPrice: boolean,
+) => {
   try {
     const order = await getOrderWithUserAndCars(orderId);
     if (!order) {
@@ -25,8 +28,7 @@ export const sendOrderMessageBotService = async (orderId: string) => {
       [InlineKeyboard.text("Принять заявку ✅", `accept-order${order.id}`)],
     ]);
 
-    const text =
-      "Поступила новая заявка\n\nСписок автомобилей находится ниже\n\nЧтобы получить детали о данных пользователя - необходимо принять заявку!";
+    const text = `Поступила новая заявка\n\nСписок автомобилей находится ниже\n\n${isInquiresAboutPrice ? "Пользователь нажал на кнопку, «Узнать цену»\n\n" : ""}Чтобы получить детали о данных пользователя - необходимо принять заявку!`;
 
     const message = await bot.api.sendMessage(
       process.env.MANAGER_CHAT || "",

@@ -16,8 +16,14 @@ interface GetCarCardParams {
 interface GetCarCardListQuery {
   limit: number;
   offset: number;
+  maxDateFilter?: number;
+  minDateFilter?: number;
   search: string;
+  sortOrder: string;
+  sortBy: string;
   stockFilter: CarCardsStockFilter;
+  carModelFilter?: string[];
+  carBrandFilter?: string[];
 }
 
 export async function carCardRoutes(fastify: FastifyInstance) {
@@ -31,6 +37,12 @@ export async function carCardRoutes(fastify: FastifyInstance) {
             limit: { type: "number" },
             offset: { type: "number" },
             search: { type: "string" },
+            sortBy: { type: "string" },
+            sortOrder: { type: "string" },
+            maxDateFilter: { type: "number" },
+            minDateFilter: { type: "number" },
+            carModelFilter: { type: "array" },
+            carBrandFilter: { type: "array" },
             stockFilter: { type: "string", enum: carCardsStockFilterEnum },
           },
           required: ["stockFilter"],
@@ -50,12 +62,24 @@ export async function carCardRoutes(fastify: FastifyInstance) {
           limit = 10,
           offset = 0,
           search,
+          carBrandFilter,
+          carModelFilter,
+          maxDateFilter,
+          minDateFilter,
+          sortBy,
+          sortOrder,
         } = request.query as GetCarCardListQuery;
         const carCards = await getListCarCardService({
           limit,
           offset,
           inStock,
           searchString: search,
+          carBrandFilter,
+          carModelFilter,
+          minDateFilter,
+          maxDateFilter,
+          sortBy,
+          sortOrder,
         });
         reply.status(200).send(carCards);
       } catch (error) {

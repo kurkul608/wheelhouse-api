@@ -17,6 +17,7 @@ export async function orderRoutes(fastify: FastifyInstance) {
           type: "object",
           properties: {
             carId: { type: "string" },
+            isInquiresAboutPrice: { type: "boolean" },
           },
           required: ["carId"],
         },
@@ -25,7 +26,10 @@ export async function orderRoutes(fastify: FastifyInstance) {
     async (request: FastifyRequest, reply: FastifyReply) => {
       const userTgId = getIdByToken(request.headers.authorization || "");
       const existUser = await getByTgIdUserService(userTgId);
-      const { carId } = request.body as { carId: string };
+      const { carId, isInquiresAboutPrice } = request.body as {
+        carId: string;
+        isInquiresAboutPrice: boolean;
+      };
 
       if (!existUser) {
         return reply.status(404).send("user not found");
@@ -33,7 +37,10 @@ export async function orderRoutes(fastify: FastifyInstance) {
 
       const order = await createOrder(carId, existUser.id);
 
-      const message = await sendOrderMessageBotService(order.id);
+      const message = await sendOrderMessageBotService(
+        order.id,
+        isInquiresAboutPrice,
+      );
       await addMessageOrderService(order.id, String(message.message_id));
 
       return reply.status(201).send(order);
