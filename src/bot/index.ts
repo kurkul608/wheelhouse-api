@@ -143,9 +143,17 @@ bot.command("about", async (ctx) => {
 5. Эмоции, которые вдохновляют. Если вы живете ради драйва и новых впечатлений, вы — наш клиент.
 
 «Сложно, когда есть выбор, глупо, когда его нет»`;
-    await ctx.reply(aboutText, {
-      reply_markup: keyboard,
-    });
+
+    const existVideoFile = await getByFilenameVideoService("IMG_9767.MOV");
+    const videoDir = path.join(__dirname, "../../video/IMG_9767.MOV");
+    const videoFile = new InputFile(videoDir);
+    await ctx.replyWithVideo(
+      existVideoFile ? existVideoFile.fileId : videoFile,
+      {
+        caption: aboutText,
+        reply_markup: keyboard,
+      },
+    );
   } catch (error) {
     console.error(error);
     await ctx.reply("Произошла ошибка");
