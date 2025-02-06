@@ -142,3 +142,9 @@ model Wishlist {
   carCardIds String[]  @db.ObjectId
   carCards   CarCard[] @relation(fields: [carCardIds], references: [id])
 }
+
+model Video {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  filename String
+  fileId   String
+}

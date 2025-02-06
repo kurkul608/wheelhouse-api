@@ -1,4 +1,4 @@
-import { Bot, GrammyError, HttpError, InlineKeyboard } from "grammy";
+import { Bot, GrammyError, HttpError, InlineKeyboard, InputFile } from "grammy";
 import dotenv from "dotenv";
 import { UserRole } from "@prisma/client";
 import { createUserService } from "../services/user/create.user.service";
@@ -9,8 +9,16 @@ import { generateUserLink } from "../utils/generateUserLink";
 import { getMiniAppLink } from "../utils/getMiniAppLink";
 import { sendNotificationToUserBotService } from "../services/bot/sendNotificationToUser.bot.service";
 import { getAndSaveWeltCarData } from "../services/dataImport/weltcat";
+import path from "node:path";
+import { getByFilenameVideoService } from "../services/video/getByFilename.video.service";
+import { createVideoService } from "../services/video/create.video.service";
+// import { fileURLToPath } from "node:url";
+// import { dirname, join } from "path";
 
 dotenv.config();
+
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = dirname(__filename);
 
 export const bot = new Bot(process.env.BOT_TOKEN || "", {
   client: { environment: process.env.LOCAL ? "test" : "prod" },
@@ -31,28 +39,40 @@ bot.command("start", async (ctx) => {
     }
 
     const customEmojiId = "5219767260561823811";
-    const messageText = `ZeuseBot — ваш личный помощник в мире эксклюзивных авто\\!
+    const messageText = `ZeuseBot — ваш личный помощник в мире эксклюзивных авто!
 
-Соприкасаясь с ZeuseBot\\, вы получаете\\:
+Соприкасаясь с ZeuseBot, вы получаете:
 
-[🤩](tg://emoji?id=#{customEmojiId}) Удобную современную платформу с премиальными и проверенными авто из любой точки мира\\.
+ Удобную современную платформу с премиальными и проверенными авто из любой точки мира.
 
-[🤩](tg://emoji?id=#{customEmojiId}) Ежедневные новинки авто со всего мира от наших надежных партнеров и заводов\\.
+ Ежедневные новинки авто со всего мира от наших надежных партнеров и заводов.
 
-[🤩](tg://emoji?id=#{customEmojiId}) Понятный и простой интерфейс без рекламы и лишней информации\\.
+ Понятный и простой интерфейс без рекламы и лишней информации.
 
-[🤩](tg://emoji?id=#{customEmojiId}) Мгновенную связь с менеджером — без заполнения форм и ожидания\\.
+ Мгновенную связь с менеджером — без заполнения форм и ожидания.
 
-С ZeuseBot вы становитесь ещё ближе к своей мечте\\! Всего в несколько секунд\\.`;
+С ZeuseBot вы становитесь ещё ближе к своей мечте! Всего в несколько секунд.`;
 
     const keyboard = new InlineKeyboard().webApp(
       "Каталог Zeuse",
       process.env.MINI_APP_URL || "",
     );
-    await ctx.reply(messageText, {
-      reply_markup: keyboard,
-      parse_mode: "MarkdownV2",
-    });
+    const startVideoFile = await getByFilenameVideoService("IMG_9760.MP4");
+    const videoDir = path.join(__dirname, "../../video/IMG_9760.MP4");
+    const videoFile = new InputFile(videoDir);
+    const message = await ctx.replyWithVideo(
+      startVideoFile ? startVideoFile.fileId : videoFile,
+      {
+        caption: messageText,
+        reply_markup: keyboard,
+      },
+    );
+    if (message.video.file_id && !startVideoFile) {
+      await createVideoService({
+        fileId: message.video.file_id,
+        filename: "IMG_9760.MP4",
+      });
+    }
   } catch (error) {
     console.error(error);
     await ctx.reply("Произошла ошибка");
