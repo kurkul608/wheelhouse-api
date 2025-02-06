@@ -12,13 +12,8 @@ import { getAndSaveWeltCarData } from "../services/dataImport/weltcat";
 import path from "node:path";
 import { getByFilenameVideoService } from "../services/video/getByFilename.video.service";
 import { createVideoService } from "../services/video/create.video.service";
-// import { fileURLToPath } from "node:url";
-// import { dirname, join } from "path";
 
 dotenv.config();
-
-// const __filename = fileURLToPath(import.meta.url);
-// const __dirname = dirname(__filename);
 
 export const bot = new Bot(process.env.BOT_TOKEN || "", {
   client: { environment: process.env.LOCAL ? "test" : "prod" },
@@ -89,6 +84,81 @@ bot.command("import", async (ctx) => {
     await ctx.reply("Импорт начался...");
     await getAndSaveWeltCarData();
     await ctx.reply("Импорт завершен");
+  } catch (error) {
+    console.error(error);
+    await ctx.reply("Произошла ошибка");
+  }
+});
+
+bot.command("channel", async (ctx) => {
+  try {
+    const keyboard = new InlineKeyboard().url(
+      "TG Канал",
+      "t.me/+8SYGKFeWxvpjY2Ey",
+    );
+    await ctx.reply("Нажми на кнопку для перехода в TG канал", {
+      reply_markup: keyboard,
+    });
+  } catch (error) {
+    console.error(error);
+    await ctx.reply("Произошла ошибка");
+  }
+});
+
+bot.command("catalog", async (ctx) => {
+  try {
+    const keyboard = new InlineKeyboard().webApp(
+      "Каталог Zeuse",
+      process.env.MINI_APP_URL || "",
+    );
+    await ctx.reply("Нажми на кнопку для перехода в каталог Zeuse", {
+      reply_markup: keyboard,
+    });
+  } catch (error) {
+    console.error(error);
+    await ctx.reply("Произошла ошибка");
+  }
+});
+
+bot.command("about", async (ctx) => {
+  try {
+    const keyboard = new InlineKeyboard()
+      .webApp("Каталог Zeuse", process.env.MINI_APP_URL || "")
+      .url("Веб сайт Zeuse", "https://zeuse.ru/")
+      .url("TG Канал", "t.me/+8SYGKFeWxvpjY2Ey");
+    const aboutText = `ZEUSE — это бренд, который разделяет вашу страсть к автомобилям. Мы создаем уникальный опыт для тех, кто ценит качество, скорость и эмоции.  
+
+Почему Вы можете доверять нам?  
+
+1. Эксклюзивные авто из любой точки мира. Доставляем авто в любой комплектации через проверенных партнеров, как для физ.лиц, так и для юр.лиц с НДС. Каждая модель проходит тщательную проверку.
+
+2. Широкий выбор. От лютых спорткаров до вездеходов, от экзотики до классики — найдем авто под ваш стиль.
+
+3. Сопровождение 24/7. Берем на себя всё: от заказа до доставки. Фото, проверки, связь — мы с вами на каждом этапе.
+
+4. Документы под ключ. Вам нужно приехать всего дважды: подписать договор и забрать авто.
+
+5. Эмоции, которые вдохновляют. Если вы живете ради драйва и новых впечатлений, вы — наш клиент.
+
+«Сложно, когда есть выбор, глупо, когда его нет»`;
+    await ctx.reply(aboutText, {
+      reply_markup: keyboard,
+    });
+  } catch (error) {
+    console.error(error);
+    await ctx.reply("Произошла ошибка");
+  }
+});
+
+bot.command("site", async (ctx) => {
+  try {
+    const keyboard = new InlineKeyboard().url(
+      "Веб сайт Zeuse",
+      "https://zeuse.ru/",
+    );
+    await ctx.reply("Нажми на кнопку для перехода на веб сайт", {
+      reply_markup: keyboard,
+    });
   } catch (error) {
     console.error(error);
     await ctx.reply("Произошла ошибка");
