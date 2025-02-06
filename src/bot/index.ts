@@ -144,16 +144,23 @@ bot.command("about", async (ctx) => {
 
 «Сложно, когда есть выбор, глупо, когда его нет»`;
 
-    const existVideoFile = await getByFilenameVideoService("IMG_9767.MOV");
-    const videoDir = path.join(__dirname, "../../video/IMG_9767.MOV");
+    const existVideoFile = await getByFilenameVideoService("IMG_9767.mp4");
+    const videoDir = path.join(__dirname, "../../video/IMG_9767.mp4");
     const videoFile = new InputFile(videoDir);
-    await ctx.replyWithVideo(
+    const message = await ctx.replyWithVideo(
       existVideoFile ? existVideoFile.fileId : videoFile,
       {
         caption: aboutText,
         reply_markup: keyboard,
       },
     );
+
+    if (message.video.file_id && !existVideoFile) {
+      await createVideoService({
+        fileId: message.video.file_id,
+        filename: "IMG_9767.mp4",
+      });
+    }
   } catch (error) {
     console.error(error);
     await ctx.reply("Произошла ошибка");
