@@ -36,7 +36,6 @@ export async function fileRoutes(fastify: FastifyInstance) {
   });
 
   fastify.post("/files", async (request, reply: FastifyReply) => {
-    console.log("ttt");
     const file = await request.file();
 
     if (!file) {

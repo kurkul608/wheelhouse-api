@@ -30,12 +30,28 @@ bot.command("start", async (ctx) => {
       });
     }
 
+    const customEmojiId = "79230830-864a-4be3-8dd0-433880dd59db";
+    const messageText = `ZeuseBot — ваш личный помощник в мире эксклюзивных авто!
+
+Соприкасаясь с ZeuseBot, вы получаете:
+
+\u{FE0F}${customEmojiId} Удобную современную платформу с премиальными и проверенными авто из любой точки мира.
+
+\u{FE0F}${customEmojiId} Ежедневные новинки авто со всего мира от наших надежных партнеров и заводов.
+
+\u{FE0F}${customEmojiId} Понятный и простой интерфейс без рекламы и лишней информации.
+
+\u{FE0F}${customEmojiId} Мгновенную связь с менеджером — без заполнения форм и ожидания.
+
+С ZeuseBot вы становитесь ещё ближе к своей мечте! Всего в несколько секунд.`;
+
     const keyboard = new InlineKeyboard().webApp(
       "Каталог Zeuse",
       process.env.MINI_APP_URL || "",
     );
-    await ctx.reply("Посмотрите каталог Zeuse, нажав на кнопку снизу", {
+    await ctx.reply(messageText, {
       reply_markup: keyboard,
+      parse_mode: "MarkdownV2",
     });
   } catch (error) {
     console.error(error);
