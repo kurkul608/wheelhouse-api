@@ -124,7 +124,9 @@ bot.command("about", async (ctx) => {
   try {
     const keyboard = new InlineKeyboard()
       .webApp("Каталог Zeuse", process.env.MINI_APP_URL || "")
+      .row()
       .url("Веб сайт Zeuse", "https://zeuse.ru/")
+      .row()
       .url("TG Канал", "t.me/+8SYGKFeWxvpjY2Ey");
     const aboutText = `ZEUSE — это бренд, который разделяет вашу страсть к автомобилям. Мы создаем уникальный опыт для тех, кто ценит качество, скорость и эмоции.  
 
