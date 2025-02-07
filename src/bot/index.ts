@@ -12,6 +12,7 @@ import { getAndSaveWeltCarData } from "../services/dataImport/weltcat";
 import path from "node:path";
 import { getByFilenameVideoService } from "../services/video/getByFilename.video.service";
 import { createVideoService } from "../services/video/create.video.service";
+import { openaiClient } from "../openai";
 
 dotenv.config();
 
@@ -179,6 +180,21 @@ bot.command("site", async (ctx) => {
   } catch (error) {
     console.error(error);
     await ctx.reply("Произошла ошибка");
+  }
+});
+
+bot.command("gpt-test", async (ctx) => {
+  try {
+    const response = await openaiClient.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: [{ role: "system", content: "Ping" }],
+    });
+
+    await ctx.reply("GPT доступен");
+  } catch (error) {
+    await ctx.reply("Ошибка при проверке доступности ChatGPT:");
+    console.error("Ошибка при проверке доступности ChatGPT:", error);
+    return false;
   }
 });
 
