@@ -71,15 +71,15 @@ export const getAndSaveWeltCarData = async () => {
             const extendCarCard =
               await getByExternalIdCarCardService(externalId);
             if (extendCarCard && extendCarCard.specifications.length > 2) {
-              server.log.info("externalId exist: ", externalId);
+              server.log.info(`externalId exist: ${externalId}`);
               return;
             }
 
             let specs = null;
             try {
               specs = await generateCarOpenaiService(JSON.stringify(weltCar));
-              server.log.info("externalId: ", externalId);
-              server.log.info("specs: ", JSON.stringify(specs));
+              server.log.info(`externalId: ${externalId}`);
+              server.log.info(`specs: ${JSON.stringify(specs)}}`);
             } catch (openAiError) {
               server.log.warn(
                 `OpenAI error for car ${externalId}: ${(openAiError as { message: string }).message}`,
