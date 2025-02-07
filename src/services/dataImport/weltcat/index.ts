@@ -70,7 +70,8 @@ export const getAndSaveWeltCarData = async () => {
             externalIds.push(externalId);
             const extendCarCard =
               await getByExternalIdCarCardService(externalId);
-            if (extendCarCard) return;
+            if (extendCarCard && extendCarCard.specifications.length > 2)
+              return;
 
             let specs = null;
             try {
