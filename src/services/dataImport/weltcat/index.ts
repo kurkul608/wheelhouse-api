@@ -1,6 +1,5 @@
 import { server } from "../../../server";
 import { getByExternalIdCarCardService } from "../../carCard/getByExternalId.carCard.service";
-import { createCarService } from "../../carCard/create.carCard.service";
 import { createManySpecificationService } from "../../specification/createMany.specification.service";
 import { setDisableManyCarCardService } from "../../carCard/setDisableMany.carCard.service";
 import { parseFiatAsset } from "../../../utils/parseFiatAsset";
@@ -12,6 +11,7 @@ import { Prisma } from "@prisma/client";
 import { chunkArray } from "../../../utils/chunkArray";
 import { InlineKeyboard } from "grammy";
 import { getMiniAppLink } from "../../../utils/getMiniAppLink";
+import { createExternalCarService } from "../../carCard/createExternal.carCard.service";
 
 export interface WeltCarData {
   id: string;
@@ -86,7 +86,7 @@ export const getAndSaveWeltCarData = async () => {
               );
             }
 
-            const carCard = await createCarService({
+            const carCard = await createExternalCarService({
               currency: parseFiatAsset(weltCar.currency),
               description: specs?.description || "",
               isActive: true,
@@ -95,6 +95,8 @@ export const getAndSaveWeltCarData = async () => {
               price: weltCar.price ? String(weltCar.price) : null,
               externalId: externalId,
             });
+            console.log("carCard: ", JSON.stringify(carCard));
+            console.log("externalId: ", externalId);
             let specifications: Prisma.SpecificationGetPayload<any>[] = [];
             if (specs?.data) {
               specifications = await createManySpecificationService(

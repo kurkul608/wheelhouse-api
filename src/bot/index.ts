@@ -13,6 +13,7 @@ import path from "node:path";
 import { getByFilenameVideoService } from "../services/video/getByFilename.video.service";
 import { createVideoService } from "../services/video/create.video.service";
 import { openaiClient } from "../openai";
+import { deleteEmptyCarCardService } from "../services/carCard/deleteEmpty.carCard.service";
 
 dotenv.config();
 
@@ -194,6 +195,11 @@ bot.command("site", async (ctx) => {
 
 bot.command("gpttest", async (ctx) => {
   try {
+    const user = await getByTgIdUserService(ctx.from!.id);
+    if (!user || !user.roles.includes(UserRole.ADMIN)) {
+      await ctx.reply("У вас нет прав на импорт");
+      return;
+    }
     await ctx.reply("Начал проверку GPT");
     const response = await openaiClient.chat.completions.create({
       model: "gpt-4o-mini",
@@ -204,6 +210,23 @@ bot.command("gpttest", async (ctx) => {
   } catch (error) {
     await ctx.reply("Ошибка при проверке доступности ChatGPT:");
     console.error("Ошибка при проверке доступности ChatGPT:", error);
+    return false;
+  }
+});
+bot.command("deleteempty", async (ctx) => {
+  try {
+    const user = await getByTgIdUserService(ctx.from!.id);
+    if (!user || !user.roles.includes(UserRole.ADMIN)) {
+      await ctx.reply("У вас нет прав на импорт");
+      return;
+    }
+    await ctx.reply("Начал удалять пустые авто");
+    await deleteEmptyCarCardService();
+
+    await ctx.reply("Закончил удалять пустые авто");
+  } catch (error) {
+    await ctx.reply("Ошибка при удалении пустых авто:");
+    console.error("Delete empty autos error:", error);
     return false;
   }
 });
