@@ -51,13 +51,6 @@ export async function fileRoutes(fastify: FastifyInstance) {
       ContentType: file.mimetype,
     });
 
-    // await uploadFileToS3();
-
-    // https://s3.regru.cloud/photos/uploads/1735424047084-file
-    // https://s3.regru.cloud/${bucket}/${uploadParams.Key}
-    // ${domain}/${bucket}/${uploadParams.Key}
-    // await uploadFileToS3();
-
     await createS3Service(uploadParams);
 
     const fileModel = await createFileService({
@@ -71,7 +64,6 @@ export async function fileRoutes(fastify: FastifyInstance) {
     console.log("Elements: ", res);
 
     return reply.status(201).send(fileModel);
-    // return reply.status(201).send("success");
   });
 
   fastify.post(

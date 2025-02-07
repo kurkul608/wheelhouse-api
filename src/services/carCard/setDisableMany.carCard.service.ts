@@ -2,12 +2,23 @@ import { Prisma } from "@prisma/client";
 import prisma from "../../prisma";
 
 export const setDisableManyCarCardService = async (
+  externalIdPart: string,
   externalIds: string[],
-): Promise<void> => {
+): Promise<Prisma.CarCardGetPayload<any>[]> => {
+  const carCards = await prisma.carCard.findMany({
+    where: {
+      externalId: {
+        startsWith: externalIdPart,
+        notIn: externalIds,
+      },
+      isActive: true,
+    },
+  });
+
   await prisma.carCard.updateMany({
     where: {
       externalId: {
-        startsWith: "weltcar-",
+        startsWith: externalIdPart,
         notIn: externalIds,
       },
       isActive: true,
@@ -16,4 +27,5 @@ export const setDisableManyCarCardService = async (
       isActive: false,
     },
   });
+  return carCards;
 };
