@@ -76,6 +76,7 @@ export const getAndSaveWeltCarData = async () => {
             let specs = null;
             try {
               specs = await generateCarOpenaiService(JSON.stringify(weltCar));
+              server.log.info("externalId: ", externalId);
               server.log.info("specs: ", JSON.stringify(specs));
             } catch (openAiError) {
               server.log.warn(
