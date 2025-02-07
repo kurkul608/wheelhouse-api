@@ -82,9 +82,18 @@ bot.command("import", async (ctx) => {
       await ctx.reply("У вас нет прав на импорт");
       return;
     }
+
     await ctx.reply("Импорт начался...");
-    await getAndSaveWeltCarData();
-    await ctx.reply("Импорт завершен");
+
+    setTimeout(async () => {
+      try {
+        await getAndSaveWeltCarData();
+        await ctx.reply("Импорт завершен");
+      } catch (error) {
+        console.error(error);
+        await ctx.reply("Произошла ошибка во время импорта");
+      }
+    }, 0);
   } catch (error) {
     console.error(error);
     await ctx.reply("Произошла ошибка");
