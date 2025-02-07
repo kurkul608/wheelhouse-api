@@ -183,10 +183,11 @@ bot.command("site", async (ctx) => {
   }
 });
 
-bot.command("gpt-test", async (ctx) => {
+bot.command("gpttest", async (ctx) => {
   try {
+    await ctx.reply("Начал проверку GPT");
     const response = await openaiClient.chat.completions.create({
-      model: "gpt-3.5-turbo",
+      model: "gpt-4o-mini",
       messages: [{ role: "system", content: "Ping" }],
     });
 
