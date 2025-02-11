@@ -27,11 +27,20 @@ export async function addItemToWishlist(userId: string, carCardId: string) {
       throw new Error("CarCard is already in the wishlist");
     }
 
-    const updatedWishlist = await prisma.wishlist.update({
+    await prisma.wishlist.update({
       where: { userId },
       data: {
         carCardIds: {
           push: carCardId,
+        },
+      },
+    });
+
+    const updatedWishlist = await prisma.wishlist.findUnique({
+      where: { userId },
+      include: {
+        carCards: {
+          include: { specifications: true },
         },
       },
     });

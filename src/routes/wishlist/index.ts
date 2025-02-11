@@ -42,6 +42,7 @@ export async function wishlistRoutes(fastify: FastifyInstance) {
           return reply.status(403).send("User is not owner of wishlist");
         }
         const wishlist = await getByUserWishlist(userId);
+        console.log(wishlist);
         reply.status(200).send(wishlist);
       } catch (error) {
         fastify.log.error("Error get wishlist by userID:", error);

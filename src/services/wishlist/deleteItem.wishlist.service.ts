@@ -30,11 +30,20 @@ export async function deleteItemFromWishlist(
       throw new Error("CarCard is not wishlist");
     }
 
-    const updatedWishlist = await prisma.wishlist.update({
+    await prisma.wishlist.update({
       where: { userId },
       data: {
         carCardIds: {
           set: wishlist.carCardIds.filter((id) => id !== carCardId),
+        },
+      },
+    });
+
+    const updatedWishlist = await prisma.wishlist.findUnique({
+      where: { userId },
+      include: {
+        carCards: {
+          include: { specifications: true },
         },
       },
     });
