@@ -1,4 +1,18 @@
 import prisma from "../../prisma";
+import { CACHE_TTL, redisClient } from "../../redisClient/idnex";
+
+type GetListCarCardParams = {
+  limit: number;
+  offset: number;
+  inStock?: boolean;
+  searchString?: string;
+  carModelFilter?: string[];
+  carBrandFilter?: string[];
+  maxDateFilter?: number;
+  minDateFilter?: number;
+  sortOrder: string;
+  sortBy: string;
+};
 
 export const getListCarCardService = async ({
   limit = 10,
@@ -11,18 +25,15 @@ export const getListCarCardService = async ({
   minDateFilter,
   sortBy,
   sortOrder,
-}: {
-  limit: number;
-  offset: number;
-  inStock?: boolean;
-  searchString?: string;
-  carModelFilter?: string[];
-  carBrandFilter?: string[];
-  maxDateFilter?: number;
-  minDateFilter?: number;
-  sortOrder: string;
-  sortBy: string;
-}) => {
+}: GetListCarCardParams) => {
+  const cacheKey = `carCards:${limit}:${offset}:${inStock}:${searchString}:${carModelFilter?.join(",")}:${carBrandFilter?.join(",")}:${maxDateFilter}:${minDateFilter}:${sortBy}:${sortOrder}`;
+
+  const cachedData = await redisClient.get(cacheKey);
+  if (cachedData) {
+    console.log("Cache hit");
+    return JSON.parse(cachedData);
+  }
+
   const whereConditions: any = {
     isActive: true,
     inStock,
@@ -107,5 +118,8 @@ export const getListCarCardService = async ({
         }
       : {}),
   });
+
+  await redisClient.set(cacheKey, JSON.stringify(carCards), "EX", CACHE_TTL);
+
   return carCards;
 };

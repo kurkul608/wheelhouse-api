@@ -22,6 +22,7 @@
     "fastify-multer": "^2.0.3",
     "grammy": "^1.32.0",
     "https-proxy-agent": "^7.0.6",
+    "ioredis": "^5.5.0",
     "node-schedule": "^2.1.1",
     "openai": "^4.80.1",
     "ts-node": "^10.9.2",
