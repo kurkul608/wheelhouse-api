@@ -139,37 +139,42 @@ bot.command("about", async (ctx) => {
       .url("Веб сайт Zeuse", "https://zeuse.ru/")
       .row()
       .url("TG Канал", "t.me/+8SYGKFeWxvpjY2Ey");
-    const aboutText = `ZEUSE — это бренд, который разделяет вашу страсть к автомобилям. Мы создаем уникальный опыт для тех, кто ценит качество, скорость и эмоции.  
+    const aboutText = `Почему вам будет хорошо  с нами?
 
-Почему Вы можете доверять нам?  
+1. Вы получаете  эксклюзивные комфортные быстрые авто. Доставляем из любой части света, в любой комплектации и через надёжных посредников, с которыми работаем годами. Автомобили проверяются ОТ и ДО перед отправкой.
 
-1. Эксклюзивные авто из любой точки мира. Доставляем авто в любой комплектации через проверенных партнеров, как для физ.лиц, так и для юр.лиц с НДС. Каждая модель проходит тщательную проверку.
+ 2. Здесь вы найдете ВСЁ: от лютых спорткаров до вездеходов. От экзотики до классики.
 
-2. Широкий выбор. От лютых спорткаров до вездеходов, от экзотики до классики — найдем авто под ваш стиль.
+3. Гарантируем полное сопровождение от заказа до доставки. Все детали, все проверки, фото, связь 24/7. Выстраиваем отношения, а не «быстро-быстро» отрабатываем деньги.
 
-3. Сопровождение 24/7. Берем на себя всё: от заказа до доставки. Фото, проверки, связь — мы с вами на каждом этапе.
+4. Мы полностью оформляем и поддерживанием всю документальную составляющую поставки. Вы приезжаете только 2 раза: подписать договор и забрать автомобиль.
 
-4. Документы под ключ. Вам нужно приехать всего дважды: подписать договор и забрать авто.
+5.  И конечно же, эмоции. Если вы обожаете запах жженого асфальта по утрам. Если вы обожаете жить. Если вы обожаете скорость и драйв. Вы — это клиент ZEUSE. 
 
-5. Эмоции, которые вдохновляют. Если вы живете ради драйва и новых впечатлений, вы — наш клиент.
+Ценности, образ жизни, доставляются вместе с нашими машинами, отношением и сервисом!
 
 «Сложно, когда есть выбор, глупо, когда его нет»`;
 
-    const existVideoFile = await getByFilenameVideoService("IMG_9767.mp4");
-    const videoDir = path.join(__dirname, "../../video/IMG_9767.mp4");
-    const videoFile = new InputFile(videoDir);
-    const message = await ctx.replyWithVideo(
-      existVideoFile ? existVideoFile.fileId : videoFile,
+    const existPhotoFile = await getByFilenameVideoService(
+      "photo_2025-02-11 08.58.39.jpeg",
+    );
+    const photoDir = path.join(
+      __dirname,
+      "../../video/photo_2025-02-11 08.58.39.jpeg",
+    );
+    const photoFile = new InputFile(photoDir);
+    const message = await ctx.replyWithPhoto(
+      existPhotoFile ? existPhotoFile.fileId : photoFile,
       {
         caption: aboutText,
         reply_markup: keyboard,
       },
     );
 
-    if (message.video.file_id && !existVideoFile) {
+    if (message.photo[0].file_id && !existPhotoFile) {
       await createVideoService({
-        fileId: message.video.file_id,
-        filename: "IMG_9767.mp4",
+        fileId: message.photo[0].file_id,
+        filename: "photo_2025-02-11 08.58.39.jpeg",
       });
     }
   } catch (error) {
@@ -224,6 +229,41 @@ bot.command("deleteempty", async (ctx) => {
     await deleteEmptyCarCardService();
 
     await ctx.reply("Закончил удалять пустые авто");
+  } catch (error) {
+    await ctx.reply("Ошибка при удалении пустых авто:");
+    console.error("Delete empty autos error:", error);
+    return false;
+  }
+});
+bot.command("exclusive", async (ctx) => {
+  try {
+    const keyboard = new InlineKeyboard().url(
+      "EXCLUSIVE ПОДБОР",
+      "https://wa.me/message/JO7FR2I6DBYAC1",
+    );
+
+    const exclusiveText = `Если не нашли в нашем каталоге ту, от которой кровь закипает внутри и страстно хочется, то напишите менеджеру, сделаем индивидуальный подбор.
+
+Можем доставить вашу эксклюзивную автомобильную мечту прямо с завода!
+`;
+
+    const existVideoFile = await getByFilenameVideoService("IMG_0362.MP4");
+    const videoDir = path.join(__dirname, "../../video/IMG_0362.MP4");
+    const videoFile = new InputFile(videoDir);
+    const message = await ctx.replyWithVideo(
+      existVideoFile ? existVideoFile.fileId : videoFile,
+      {
+        caption: exclusiveText,
+        reply_markup: keyboard,
+      },
+    );
+
+    if (message.video.file_id && !existVideoFile) {
+      await createVideoService({
+        fileId: message.video.file_id,
+        filename: "IMG_0362.MP4",
+      });
+    }
   } catch (error) {
     await ctx.reply("Ошибка при удалении пустых авто:");
     console.error("Delete empty autos error:", error);
