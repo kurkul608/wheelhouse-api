@@ -1,5 +1,6 @@
 import { Prisma, UserRole } from "@prisma/client";
 import prisma from "../../prisma";
+import { ONE_MONTH_CACHE_TTL, redisClient } from "../../redisClient/idnex";
 
 export const updateRoleUserService = async (
   userId: string,
@@ -37,11 +38,25 @@ export const updateRoleUserService = async (
       return [UserRole.USER];
     };
 
+    const cacheKey = `user:userTgId-${user.tgId}`;
+
+    const cachedData = await redisClient.get(cacheKey);
+    if (cachedData) {
+      await redisClient.del(cacheKey);
+    }
+
     await prisma.user.update({
       where: { id: userId },
       data: { roles: getNewRoles() },
     });
     const updatedUser = await prisma.user.findUnique({ where: { id: userId } });
+
+    await redisClient.set(
+      cacheKey,
+      JSON.stringify(updatedUser),
+      "EX",
+      ONE_MONTH_CACHE_TTL,
+    );
 
     return updatedUser as Prisma.UserGetPayload<any>;
   } catch (error) {
