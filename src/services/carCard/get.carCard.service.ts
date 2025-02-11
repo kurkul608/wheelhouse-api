@@ -1,11 +1,12 @@
 import prisma from "../../prisma";
 import { Prisma } from "@prisma/client";
 import { CACHE_TTL, redisClient } from "../../redisClient/idnex";
+import { generateCarCardKey } from "../../utils/redisKeys/generateCarCardKey";
 
 export const getCarCardService = async (
   id: string,
 ): Promise<Prisma.CarCardGetPayload<any> | null> => {
-  const cacheKey = `car-card-${id}`;
+  const cacheKey = generateCarCardKey(id);
 
   const cachedData = await redisClient.get(cacheKey);
   if (cachedData) {

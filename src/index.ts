@@ -3,8 +3,6 @@ import { bot } from "./bot";
 import { getAndSaveWeltCarData } from "./services/dataImport/weltcat";
 import { scheduleJob } from "node-schedule";
 import { server } from "./server";
-import { openaiClient } from "./openai";
-import { generateCarOpenaiService } from "./services/openai/generateCar.openai.service";
 
 dotenv.config();
 

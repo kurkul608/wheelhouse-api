@@ -1,10 +1,6 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { getListCarCardService } from "../../services/carCard/getList.carCard.service";
 import { getCarCardService } from "../../services/carCard/get.carCard.service";
-import { authMiddleware } from "../../middlewares/authMiddleware";
-import { isBooleanObject } from "node:util/types";
-import { createCarService } from "../../services/carCard/create.carCard.service";
-import { parseFiatAsset } from "../../utils/parseFiatAsset";
 
 export const carCardsStockFilterEnum = ["all", "inStock", "onOrder"] as const;
 export type CarCardsStockFilter = (typeof carCardsStockFilterEnum)[number];

@@ -1,7 +1,9 @@
 import prisma from "../../prisma";
 import { CACHE_TTL, redisClient } from "../../redisClient/idnex";
+import { generateCarCardListKey } from "../../utils/redisKeys/generateCarCardListKey";
+import { parseCarCardListKey } from "../../utils/redisKeys/parseCarCardListKey";
 
-type GetListCarCardParams = {
+export type GetListCarCardParams = {
   limit: number;
   offset: number;
   inStock?: boolean;
@@ -26,7 +28,18 @@ export const getListCarCardService = async ({
   sortBy,
   sortOrder,
 }: GetListCarCardParams) => {
-  const cacheKey = `carCards:${limit}:${offset}:${inStock}:${searchString}:${carModelFilter?.join(",")}:${carBrandFilter?.join(",")}:${maxDateFilter}:${minDateFilter}:${sortBy}:${sortOrder}`;
+  const cacheKey = generateCarCardListKey({
+    limit,
+    offset,
+    inStock,
+    searchString,
+    carModelFilter,
+    carBrandFilter,
+    maxDateFilter,
+    minDateFilter,
+    sortBy,
+    sortOrder,
+  });
 
   const cachedData = await redisClient.get(cacheKey);
   if (cachedData) {

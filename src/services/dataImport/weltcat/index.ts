@@ -12,6 +12,7 @@ import { chunkArray } from "../../../utils/chunkArray";
 import { InlineKeyboard } from "grammy";
 import { getMiniAppLink } from "../../../utils/getMiniAppLink";
 import { createExternalCarService } from "../../carCard/createExternal.carCard.service";
+import { updateListCacheCarCardService } from "../../carCard/updateListCache.carCard.service";
 
 export interface WeltCarData {
   id: string;
@@ -124,6 +125,10 @@ export const getAndSaveWeltCarData = async () => {
       WELT_CAR_ID,
       externalIds,
     );
+
+    updateListCacheCarCardService().catch((err) => {
+      console.error("Ошибка при обработке ключей:", err);
+    });
 
     await bot.api.sendMessage(
       process.env.MANAGER_CHAT || "",

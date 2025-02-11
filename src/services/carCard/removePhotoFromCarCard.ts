@@ -1,10 +1,14 @@
 import prisma from "../../prisma";
+import { CACHE_TTL, redisClient } from "../../redisClient/idnex";
+import { updateListCacheCarCardService } from "./updateListCache.carCard.service";
+import { generateCarCardKey } from "../../utils/redisKeys/generateCarCardKey";
 
 export const removePhotoFromCarCard = async (
   carCardId: string,
   fileId: string,
 ) => {
   try {
+    const cacheKey = generateCarCardKey(carCardId);
     const carCard = await prisma.carCard.findUnique({
       where: { id: carCardId },
       include: { photos: true },
@@ -27,6 +31,17 @@ export const removePhotoFromCarCard = async (
           disconnect: { id: fileId },
         },
       },
+    });
+
+    const cachedData = await redisClient.get(cacheKey);
+    if (cachedData) {
+      await redisClient.del(cacheKey);
+    }
+
+    await redisClient.set(cacheKey, JSON.stringify(carCard), "EX", CACHE_TTL);
+
+    updateListCacheCarCardService().catch((err) => {
+      console.error("Ошибка при обработке ключей:", err);
     });
 
     return {
