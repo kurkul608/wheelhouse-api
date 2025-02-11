@@ -30,7 +30,7 @@ export const getListCarCardService = async ({
 
   const cachedData = await redisClient.get(cacheKey);
   if (cachedData) {
-    console.log("Cache hit");
+    console.log("Cache getListCarCardService hit");
     return JSON.parse(cachedData);
   }
 

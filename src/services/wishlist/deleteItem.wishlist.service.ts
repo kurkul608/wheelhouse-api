@@ -1,10 +1,18 @@
 import prisma from "../../prisma";
+import { ONE_MONTH_CACHE_TTL, redisClient } from "../../redisClient/idnex";
 
 export async function deleteItemFromWishlist(
   userId: string,
   carCardId: string,
 ) {
   try {
+    const cacheKey = `wishlist:userId-${userId}`;
+
+    const cachedData = await redisClient.get(cacheKey);
+    if (cachedData) {
+      await redisClient.del(cacheKey);
+    }
+
     const [wishlist, carCard] = await Promise.all([
       prisma.wishlist.findUnique({ where: { userId } }),
       prisma.carCard.findUnique({ where: { id: carCardId } }),
@@ -30,6 +38,13 @@ export async function deleteItemFromWishlist(
         },
       },
     });
+
+    await redisClient.set(
+      cacheKey,
+      JSON.stringify(updatedWishlist),
+      "EX",
+      ONE_MONTH_CACHE_TTL,
+    );
 
     return updatedWishlist;
   } catch (error) {

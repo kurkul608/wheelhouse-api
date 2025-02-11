@@ -1,5 +1,6 @@
 import prisma from "../../prisma";
 import { Prisma } from "@prisma/client";
+import { redisClient } from "../../redisClient/idnex";
 
 export const getByUserBucket = async (
   userId: string,
@@ -10,6 +11,15 @@ export const getByUserBucket = async (
     };
   };
 }> | null> => {
+  const cacheKey = `bucket:userId-${userId}`;
+
+  const cachedData = await redisClient.get(cacheKey);
+
+  if (cachedData) {
+    console.log("Cache getByUserWishlist hit");
+    return JSON.parse(cachedData);
+  }
+
   const bucket = await prisma.bucket.findUnique({
     where: { userId },
     include: {
@@ -18,6 +28,8 @@ export const getByUserBucket = async (
       },
     },
   });
+
+  await redisClient.set(cacheKey, JSON.stringify(bucket));
 
   return bucket;
 };
