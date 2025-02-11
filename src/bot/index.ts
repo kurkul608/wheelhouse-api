@@ -313,7 +313,6 @@ bot.on("callback_query:data", async (ctx) => {
       ],
     ]);
 
-    console.log(generateUserLink(`${order?.user.tgId}`, order?.user.username));
     await ctx.editMessageText(editMessageText, { reply_markup: buttons });
 
     await ctx.reply(

@@ -95,8 +95,6 @@ export const getAndSaveWeltCarData = async () => {
               price: weltCar.price ? String(weltCar.price) : null,
               externalId: externalId,
             });
-            console.log("carCard: ", JSON.stringify(carCard));
-            console.log("externalId: ", externalId);
             let specifications: Prisma.SpecificationGetPayload<any>[] = [];
             if (specs?.data) {
               specifications = await createManySpecificationService(
