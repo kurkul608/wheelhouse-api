@@ -86,8 +86,6 @@ export async function fileRoutes(fastify: FastifyInstance) {
         fileId: string;
         carCardId: string;
       };
-      console.log("fileId ", fileId);
-      console.log("carCardId ", carCardId);
 
       const carCard = await getCarCardService(carCardId);
       if (!carCard) {
