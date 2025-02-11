@@ -46,6 +46,8 @@ model Specification {
   carCardId String   @db.ObjectId
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([field, value])
 }
 
 enum FiatAsset {
@@ -89,6 +91,8 @@ model CarCard {
   wishlists      Wishlist[]      @relation(fields: [wishlistIds], references: [id])
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
+
+  @@index([isActive, inStock, createdAt])
 }
 
 model File {
