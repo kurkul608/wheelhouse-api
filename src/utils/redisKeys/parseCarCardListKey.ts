@@ -27,7 +27,7 @@ export const parseCarCardListKey = (key: string): GetListCarCardParams => {
     inStockStr === "true" ? true : inStockStr === "false" ? false : undefined;
   const searchString =
     searchStringStr === "undefined" || searchStringStr === ""
-      ? undefined
+      ? ""
       : searchStringStr;
   const carModelFilter =
     carModelFilterStr === "undefined" || carModelFilterStr === ""

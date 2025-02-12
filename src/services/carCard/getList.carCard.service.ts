@@ -40,6 +40,20 @@ export const getListCarCardService = async ({
     sortBy,
     sortOrder,
   });
+  if (inStock) {
+    console.log({
+      limit,
+      offset,
+      inStock,
+      searchString,
+      carModelFilter,
+      carBrandFilter,
+      maxDateFilter,
+      minDateFilter,
+      sortBy,
+      sortOrder,
+    });
+  }
 
   const cachedData = await redisClient.get(cacheKey);
   if (cachedData) {
@@ -95,25 +109,25 @@ export const getListCarCardService = async ({
       });
     });
   }
-  if (minDateFilter) {
-    if (!whereConditions.specifications.some.AND) {
-      whereConditions.specifications.some.AND = [];
-    }
-    whereConditions.specifications.some.AND.push({
-      field: "year",
-      value: { gte: minDateFilter.toString() },
-    });
-  }
+  // if (minDateFilter) {
+  //   if (!whereConditions.specifications.some.AND) {
+  //     whereConditions.specifications.some.AND = [];
+  //   }
+  //   whereConditions.specifications.some.AND.push({
+  //     field: "year",
+  //     value: { gte: minDateFilter.toString() },
+  //   });
+  // }
 
-  if (maxDateFilter) {
-    if (!whereConditions.specifications.some.AND) {
-      whereConditions.specifications.some.AND = [];
-    }
-    whereConditions.specifications.some.AND.push({
-      field: "year",
-      value: { lte: maxDateFilter.toString() },
-    });
-  }
+  // if (maxDateFilter) {
+  //   if (!whereConditions.specifications.some.AND) {
+  //     whereConditions.specifications.some.AND = [];
+  //   }
+  //   whereConditions.specifications.some.AND.push({
+  //     field: "year",
+  //     value: { lte: maxDateFilter.toString() },
+  //   });
+  // }
 
   const carCards = await prisma.carCard.findMany({
     skip: offset,

@@ -7,9 +7,14 @@ import { bot } from "../../bot";
 
 export const processKey = async (key: string): Promise<void> => {
   const params = parseCarCardListKey(key);
-
-  console.log("Обработка ключа:", key, "с параметрами:", params);
-  await getListCarCardService(params);
+  // console.log(`Значение ключа: ${key}`);
+  // console.log("Обработка ключа:", key, "с параметрами:", params);
+  await redisClient.del(key);
+  const data = await getListCarCardService(params);
+  if (params.inStock) {
+    console.log(data);
+  }
+  // console.log("Гет лист дата:", data);
 };
 
 export const updateListCacheCarCardService = async () => {
