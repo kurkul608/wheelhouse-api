@@ -18,7 +18,15 @@ export const updateCarCardService = async (
       await redisClient.del(cacheKey);
     }
 
-    const carCard = await prisma.carCard.findFirst({ where: { id: carCarId } });
+    const carCard = await prisma.carCard.findFirst({
+      where: { id: carCarId },
+      include: {
+        photos: true,
+        specifications: {
+          select: { field: true, fieldName: true, value: true, id: true },
+        },
+      },
+    });
     await redisClient.set(cacheKey, JSON.stringify(carCard), "EX", CACHE_TTL);
 
     updateListCacheCarCardService().catch((err) => {

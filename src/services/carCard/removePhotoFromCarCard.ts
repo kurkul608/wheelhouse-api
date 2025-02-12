@@ -2,6 +2,7 @@ import prisma from "../../prisma";
 import { CACHE_TTL, redisClient } from "../../redisClient/idnex";
 import { updateListCacheCarCardService } from "./updateListCache.carCard.service";
 import { generateCarCardKey } from "../../utils/redisKeys/generateCarCardKey";
+import { getCarCardService } from "./get.carCard.service";
 
 export const removePhotoFromCarCard = async (
   carCardId: string,
@@ -37,6 +38,8 @@ export const removePhotoFromCarCard = async (
     if (cachedData) {
       await redisClient.del(cacheKey);
     }
+
+    await getCarCardService(carCardId);
 
     await redisClient.set(cacheKey, JSON.stringify(carCard), "EX", CACHE_TTL);
 
