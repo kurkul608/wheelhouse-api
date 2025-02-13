@@ -36,6 +36,9 @@ export const getListManagerCarService = async ({
     const cars = await prisma.carCard.findMany({
       include: { specifications: true, photos: true },
       where: whereConditions,
+      orderBy: {
+        createdAt: "desc",
+      },
       // skip: offset,
       // take: limit,
     });
