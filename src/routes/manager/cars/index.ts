@@ -7,6 +7,7 @@ import { createCarService } from "../../../services/carCard/create.carCard.servi
 import { parseFiatAsset } from "../../../utils/parseFiatAsset";
 import { updateCarCardService } from "../../../services/carCard/update.carCard.service";
 import { removePhotoFromCarCard } from "../../../services/carCard/removePhotoFromCarCard";
+import { getCarManagerService } from "../../../services/manager/car/getCar.manager.service";
 
 export const carCardsActiveFilterEnum = ["all", "active", "disabled"] as const;
 export type CarCardsActiveFilter = (typeof carCardsActiveFilterEnum)[number];
@@ -108,6 +109,33 @@ export async function managerCarsRoutes(fastify: FastifyInstance) {
       });
 
       reply.status(200).send(cars);
+    },
+  );
+
+  fastify.get(
+    "/manager/cars/:carId",
+    {
+      schema: {
+        params: {
+          type: "object",
+          properties: {
+            carId: { type: "string" },
+          },
+          required: ["carId"],
+        },
+      },
+    },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      try {
+        const { carId } = request.params as { carId: string };
+
+        const carCard = await getCarManagerService(carId);
+
+        reply.status(200).send(carCard);
+      } catch (error) {
+        console.error("Error get car:", error);
+        reply.status(500).send({ error: "Unable to get car" });
+      }
     },
   );
 

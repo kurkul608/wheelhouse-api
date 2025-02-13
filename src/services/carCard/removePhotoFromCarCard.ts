@@ -3,6 +3,7 @@ import { CACHE_TTL, redisClient } from "../../redisClient/idnex";
 import { updateListCacheCarCardService } from "./updateListCache.carCard.service";
 import { generateCarCardKey } from "../../utils/redisKeys/generateCarCardKey";
 import { getCarCardService } from "./get.carCard.service";
+import { updateCarCacheCarCardService } from "./updateCarCache.carCard.service";
 
 export const removePhotoFromCarCard = async (
   carCardId: string,
@@ -44,6 +45,9 @@ export const removePhotoFromCarCard = async (
     await redisClient.set(cacheKey, JSON.stringify(carCard), "EX", CACHE_TTL);
 
     updateListCacheCarCardService().catch((err) => {
+      console.error("Ошибка при обработке ключей:", err);
+    });
+    updateCarCacheCarCardService(carCardId).catch((err) => {
       console.error("Ошибка при обработке ключей:", err);
     });
 

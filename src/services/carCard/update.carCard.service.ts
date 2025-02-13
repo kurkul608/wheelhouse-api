@@ -3,6 +3,7 @@ import { Prisma } from "@prisma/client";
 import { CACHE_TTL, redisClient } from "../../redisClient/idnex";
 import { updateListCacheCarCardService } from "./updateListCache.carCard.service";
 import { generateCarCardKey } from "../../utils/redisKeys/generateCarCardKey";
+import { updateCarCacheCarCardService } from "./updateCarCache.carCard.service";
 
 export const updateCarCardService = async (
   carCarId: string,
@@ -30,6 +31,9 @@ export const updateCarCardService = async (
     await redisClient.set(cacheKey, JSON.stringify(carCard), "EX", CACHE_TTL);
 
     updateListCacheCarCardService().catch((err) => {
+      console.error("Ошибка при обработке ключей:", err);
+    });
+    updateCarCacheCarCardService(carCarId).catch((err) => {
       console.error("Ошибка при обработке ключей:", err);
     });
 

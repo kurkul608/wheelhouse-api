@@ -11,60 +11,48 @@ import { getCarCardService } from "../../services/carCard/get.carCard.service";
 import { Prisma } from "@prisma/client";
 import { managerMiddleware } from "../../middlewares/managerMiddleware";
 import { PutObjectCommand, PutObjectRequest } from "@aws-sdk/client-s3";
-
-// interface FileRequest extends FastifyRequest {
-//   file?: {
-//     buffer: Buffer;
-//     encoding: string;
-//     fieldname: string;
-//     mimetype: string;
-//     originalname: string;
-//     size: number;
-//   };
-// }
-
-// export const storage = multer.memoryStorage();
-// export const upload = multer({ storage });
+import { updateListCacheCarCardService } from "../../services/carCard/updateListCache.carCard.service";
+import { updateCarCacheCarCardService } from "../../services/carCard/updateCarCache.carCard.service";
 
 export async function fileRoutes(fastify: FastifyInstance) {
   fastify.addHook("preHandler", authMiddleware);
 
-  fastify.register(fastifyMultipart, {
-    limits: {
-      fileSize: 25 * 1024 * 1024, // 5MB
+  fastify.post(
+    "/files",
+    {
+      preHandler: managerMiddleware,
+      schema: {
+        body: {
+          type: "object",
+          properties: {
+            key: { type: "string" },
+            bucket: { type: "string" },
+            fileSize: { type: "string" },
+          },
+          required: ["key", "bucket", "fileSize"],
+        },
+      },
     },
-  });
+    async (request, reply: FastifyReply) => {
+      const { key, bucket, fileSize } = request.body as {
+        key: string;
+        bucket: string;
+        fileSize: string;
+      };
 
-  fastify.post("/files", async (request, reply: FastifyReply) => {
-    const file = await request.file();
+      const fileModel = await createFileService({
+        file_size: +fileSize,
+        key: key ?? "",
+        bucket: bucket ?? "",
+        domain: process.env.S3_DOMAIN ?? "",
+      });
 
-    if (!file) {
-      return reply.status(400).send({ error: "No file uploaded" });
-    }
+      // const res = await getElements();
+      // console.log("Elements: ", res);
 
-    const fileName = `${Date.now()}-${file.filename}`;
-
-    const uploadParams: PutObjectCommand = new PutObjectCommand({
-      Bucket: process.env.S3_BUCKET || "",
-      Key: `uploads/${fileName}`,
-      Body: await file.toBuffer(),
-      ContentType: file.mimetype,
-    });
-
-    await createS3Service(uploadParams);
-
-    const fileModel = await createFileService({
-      file_size: file.file.bytesRead,
-      key: uploadParams.input.Key ?? "",
-      bucket: uploadParams.input.Bucket ?? "",
-      domain: process.env.S3_DOMAIN ?? "",
-    });
-
-    const res = await getElements();
-    console.log("Elements: ", res);
-
-    return reply.status(201).send(fileModel);
-  });
+      return reply.status(201).send(fileModel);
+    },
+  );
 
   fastify.post(
     "/files/:fileId/add-to/:carCardId",
@@ -95,6 +83,14 @@ export async function fileRoutes(fastify: FastifyInstance) {
       const file = await updateFileService(fileId, {
         carCardId,
       } as Prisma.FileUpdateInput);
+
+      updateListCacheCarCardService().catch((err) => {
+        console.error("Ошибка при обработке ключей:", err);
+      });
+
+      updateCarCacheCarCardService(carCardId).catch((err) => {
+        console.error("Ошибка при обработке ключей:", err);
+      });
 
       return reply.status(200).send(file);
     },
