@@ -40,20 +40,6 @@ export const getListCarCardService = async ({
     sortBy,
     sortOrder,
   });
-  if (inStock) {
-    console.log({
-      limit,
-      offset,
-      inStock,
-      searchString,
-      carModelFilter,
-      carBrandFilter,
-      maxDateFilter,
-      minDateFilter,
-      sortBy,
-      sortOrder,
-    });
-  }
 
   const cachedData = await redisClient.get(cacheKey);
   if (cachedData) {
@@ -146,7 +132,7 @@ export const getListCarCardService = async ({
       : {}),
   });
 
-  await redisClient.set(cacheKey, JSON.stringify(carCards), "EX", CACHE_TTL);
+  // await redisClient.set(cacheKey, JSON.stringify(carCards), "EX", CACHE_TTL);
 
   return carCards;
 };
