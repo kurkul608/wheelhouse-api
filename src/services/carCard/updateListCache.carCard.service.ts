@@ -24,7 +24,7 @@ export const updateListCacheCarCardService = async () => {
     minTime: 5000,
   });
   const message = await bot.api.sendMessage(
-    process.env.MANAGER_CHAT || "",
+    process.env.SERVICE_CHAT || "",
     "Начат процесс обновления кэшированных карточек автомобилей",
   );
 
@@ -32,7 +32,7 @@ export const updateListCacheCarCardService = async () => {
     await limiter.schedule(() => processKey(key));
   }
   await bot.api.sendMessage(
-    process.env.MANAGER_CHAT || "",
+    process.env.SERVICE_CHAT || "",
     "Процесс обновления кэшированных карточек автомобилей окончен",
     {
       reply_to_message_id: message.message_id,

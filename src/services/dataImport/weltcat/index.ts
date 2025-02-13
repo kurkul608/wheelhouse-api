@@ -38,7 +38,7 @@ export const WELT_CAR_DATA_PATH = "cars/list/json";
 export const getAndSaveWeltCarData = async () => {
   server.log.info("Import weltcar data starting...");
   await bot.api.sendMessage(
-    process.env.MANAGER_CHAT || "",
+    process.env.SERVICE_CHAT || "",
     "Начат импорт данных",
   );
 
@@ -162,7 +162,7 @@ export const getAndSaveWeltCarData = async () => {
     server.log.info("Import weltcar data finished");
   } catch (error) {
     await bot.api.sendMessage(
-      process.env.MANAGER_CHAT || "",
+      process.env.SERVICE_CHAT || "",
       "Во время импорта произошла ошибка, импорт остановлен",
     );
     server.log.error(
