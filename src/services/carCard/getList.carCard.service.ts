@@ -49,70 +49,81 @@ export const getListCarCardService = async ({
 
   const whereConditions: any = {
     isActive: true,
-    inStock,
-    specifications: {
-      some: {},
-    },
+    ...(typeof inStock !== "undefined" && { inStock }),
   };
 
-  if (searchString) {
-    whereConditions.specifications = {
-      some: {
-        OR: [
-          {
-            field: "model",
-            value: { contains: searchString, mode: "insensitive" },
+  const andConditions: any[] = [];
+
+  if (
+    searchString ||
+    (carBrandFilter && carBrandFilter.length) ||
+    (carModelFilter && carModelFilter.length)
+  ) {
+    const orConditions: any[] = [];
+
+    if (searchString) {
+      orConditions.push(
+        {
+          field: "model",
+          value: { contains: searchString, mode: "insensitive" },
+        },
+        {
+          field: "specification",
+          value: { contains: searchString, mode: "insensitive" },
+        },
+      );
+    }
+
+    if (carBrandFilter && carBrandFilter.length) {
+      carBrandFilter.forEach((brand) => {
+        orConditions.push({
+          field: "model",
+          value: { contains: brand, mode: "insensitive" },
+        });
+      });
+    }
+
+    if (carModelFilter && carModelFilter.length) {
+      carModelFilter.forEach((model) => {
+        orConditions.push({
+          field: "specification",
+          value: { contains: model, mode: "insensitive" },
+        });
+      });
+    }
+
+    if (orConditions.length) {
+      andConditions.push({
+        specifications: {
+          some: {
+            OR: orConditions,
           },
-          {
-            field: "specification",
-            value: { contains: searchString, mode: "insensitive" },
-          },
-        ],
+        },
+      });
+    }
+  }
+
+  if (minDateFilter || maxDateFilter) {
+    const yearCondition: any = {};
+    if (minDateFilter) {
+      yearCondition.gte = minDateFilter.toString();
+    }
+    if (maxDateFilter) {
+      yearCondition.lte = maxDateFilter.toString();
+    }
+
+    andConditions.push({
+      specifications: {
+        some: {
+          field: "year",
+          value: yearCondition,
+        },
       },
-    };
-  }
-  if (carBrandFilter) {
-    if (!whereConditions.specifications.some.OR) {
-      whereConditions.specifications.some.OR = [];
-    }
-
-    carBrandFilter.forEach((brand) => {
-      whereConditions.specifications.some.OR.push({
-        field: "model",
-        value: { contains: brand, mode: "insensitive" },
-      });
-    });
-  }
-  if (carModelFilter) {
-    if (!whereConditions.specifications.some.OR) {
-      whereConditions.specifications.some.OR = [];
-    }
-
-    carModelFilter.forEach((model) => {
-      whereConditions.specifications.some.OR.push({
-        field: "specification",
-        value: { contains: model, mode: "insensitive" },
-      });
-    });
-  }
-  if (minDateFilter) {
-    if (!whereConditions.specifications.some.AND) {
-      whereConditions.specifications.some.AND = [];
-    }
-    whereConditions.specifications.some.AND.push({
-      field: "year",
-      value: { gte: minDateFilter.toString() },
     });
   }
 
-  if (maxDateFilter) {
-    if (!whereConditions.specifications.some.AND) {
-      whereConditions.specifications.some.AND = [];
-    }
-    whereConditions.specifications.some.AND.push({
-      field: "year",
-      value: { lte: maxDateFilter.toString() },
-    });
+  if (andConditions.length) {
+    whereConditions.AND = andConditions;
   }
 
   const carCards = await prisma.carCard.findMany({
@@ -132,7 +143,7 @@ export const getListCarCardService = async ({
       : {}),
   });
 
-  // await redisClient.set(cacheKey, JSON.stringify(carCards), "EX", CACHE_TTL);
+  await redisClient.set(cacheKey, JSON.stringify(carCards), "EX", CACHE_TTL);
 
   return carCards;
 };
