@@ -2,6 +2,7 @@ import prisma from "../../prisma";
 import { CACHE_TTL, redisClient } from "../../redisClient/idnex";
 import { generateCarCardListKey } from "../../utils/redisKeys/generateCarCardListKey";
 import { parseCarCardListKey } from "../../utils/redisKeys/parseCarCardListKey";
+import { Prisma } from "@prisma/client";
 
 export type GetListCarCardParams = {
   limit: number;
@@ -27,7 +28,11 @@ export const getListCarCardService = async ({
   minDateFilter,
   sortBy,
   sortOrder,
-}: GetListCarCardParams) => {
+}: GetListCarCardParams): Promise<{
+  items: Prisma.CarCardGetPayload<any>[];
+  page: number;
+  hasMore: boolean;
+}> => {
   const cacheKey = generateCarCardListKey({
     limit,
     offset,
@@ -143,7 +148,29 @@ export const getListCarCardService = async ({
       : {}),
   });
 
-  await redisClient.set(cacheKey, JSON.stringify(carCards), "EX", CACHE_TTL);
+  const count = await prisma.carCard.count({
+    where: whereConditions,
+    ...(sortOrder && sortBy
+      ? {
+          orderBy: {
+            createdAt: sortOrder === "asc" ? "asc" : "desc",
+          },
+        }
+      : {}),
+  });
 
-  return carCards;
+  const currentPage = offset / limit + 1;
+  console.log("count: ", count);
+  console.log("currentPage: ", currentPage);
+  console.log("currentPage * limit: ", currentPage * limit);
+
+  const result = {
+    items: carCards,
+    page: currentPage,
+    hasMore: count > currentPage * limit,
+  };
+
+  await redisClient.set(cacheKey, JSON.stringify(result), "EX", CACHE_TTL);
+
+  return result;
 };
