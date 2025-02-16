@@ -1,4 +1,11 @@
-import { Bot, GrammyError, HttpError, InlineKeyboard, InputFile } from "grammy";
+import {
+  Bot,
+  GrammyError,
+  HttpError,
+  InlineKeyboard,
+  InputFile,
+  Keyboard,
+} from "grammy";
 import dotenv from "dotenv";
 import { UserRole } from "@prisma/client";
 import { createUserService } from "../services/user/create.user.service";
@@ -24,14 +31,28 @@ export const bot = new Bot(process.env.BOT_TOKEN || "", {
 bot.command("start", async (ctx) => {
   try {
     const existUser = await getByTgIdUserService(ctx.from!.id);
+    // if (!existUser) {
+    //   await createUserService({
+    //     tgId: ctx.from!.id,
+    //     username: ctx.from?.username,
+    //     firstName: ctx.from?.first_name,
+    //     lastName: ctx.from?.last_name,
+    //     languageCode: ctx.from?.language_code,
+    //     roles: [UserRole.USER],
+    //   });
+    // }
+
     if (!existUser) {
-      await createUserService({
+      createUserService({
         tgId: ctx.from!.id,
         username: ctx.from?.username,
         firstName: ctx.from?.first_name,
         lastName: ctx.from?.last_name,
         languageCode: ctx.from?.language_code,
         roles: [UserRole.USER],
+      }).catch(async (error) => {
+        console.error(error);
+        await ctx.reply("Произошла ошибка");
       });
     }
 
@@ -139,7 +160,8 @@ bot.command("about", async (ctx) => {
       .url("Веб сайт Zeuse", "https://zeuse.ru/")
       .row()
       .url("TG Канал", "t.me/+8SYGKFeWxvpjY2Ey");
-    const aboutText = `ПОЧЕМУ ZEUSE — ЭТО ВЫБОР, КОТОРЫЙ ВЫ ЗАСЛУЖИВАЕТЕ?
+    const aboutText = `
+ПОЧЕМУ ZEUSE — ЭТО ВЫБОР, КОТОРЫЙ ВЫ ЗАСЛУЖИВАЕТЕ?
 
 • Мы слеплены из одного теста. ZEUSE — это бренд, который разделяет вашу страсть к автомобилям. Мы создаем уникальный опыт для тех, кто ценит качество, скорость и эмоции.
 
@@ -147,7 +169,9 @@ bot.command("about", async (ctx) => {
 
 • Широкий выбор — от лютых спорткаров до вездеходов, от экзотики до классики — найдем авто под ваш стиль.
 
-• Надежность на каждом этапе: проверенные автомобили, надежные партнеры с Европы, с которыми работаем годами.
+• Надежность на каждом этапе: проверенные автомобили,
+
+• Прозрачность: детальные отчеты с фото на всех этапах, чтобы вы знали, где находится ваш авто в любой момент.
 
 • Сопровождение 24/7. Берем на себя всё: от заказа до доставки. Всегда на связи, чтобы сохранить ваши нервы.
 
@@ -273,6 +297,34 @@ bot.command("exclusive", async (ctx) => {
   }
 });
 
+bot.command("contact", async (ctx) => {
+  try {
+    const user = await getByTgIdUserService(ctx.from!.id);
+    if (!user || !user.roles.includes(UserRole.SUPER_ADMIN)) {
+      await ctx.reply("У вас нет прав на этот функционал");
+      return;
+    }
+
+    const keyboard = new Keyboard()
+      .requestContact("📞 Поделиться номером")
+      .resized();
+    await ctx.reply("Нажмите кнопку ниже, чтобы поделиться номером:", {
+      reply_markup: keyboard,
+    });
+    await ctx.answerCallbackQuery();
+  } catch (error) {
+    await ctx.reply("Ошибка при удалении пустых авто:");
+    console.error("Delete empty autos error:", error);
+    return false;
+  }
+});
+
+// bot.on("message:contact", async (ctx) => {
+//   const contact = ctx.message.contact;
+//   console.log(JSON.stringify(contact));
+//   await ctx.reply(`Спасибо! Ваш номер телефона: ${contact.phone_number}`);
+// });
+
 bot.on("callback_query:data", async (ctx) => {
   const callbackData = ctx.callbackQuery.data;
 
@@ -293,7 +345,11 @@ bot.on("callback_query:data", async (ctx) => {
 
     const messageId = ctx.callbackQuery.message!.message_id;
 
-    const editMessageText = `Пользователь ${ctx.from.first_name} @${ctx.from.username}\n\nОтветственный менеджер ${manager.firstName} @${manager.username}`;
+    const editMessageText = `Пользователь ${order?.user.firstName ?? ""} ${order?.user.lastName ?? ""} @${ctx.from.username ?? ""}\n\nОтветственный менеджер ${manager.firstName} @${manager.username}
+    Номер телефона пользавтеля -   \`${order?.user.phoneNumber}\`
+    
+    ЕСЛИ КНОПКА ОТКРЫТЬ ПОЛЬЗОВАТЕЛЯ НЕ РАБОТАЕТ, ТО НУЖНО СВЯЗАТЬСЯ С КЛИНЕТОМ ПРИ ПОМОЩИ ТЕЛЕФОНА
+    ЧТОБЫ СКОПИРОВАТЬ НОМЕР ТЕЛЕФОНА НАЖМИТЕ НА НЕГО!`;
     const carsInlineButtons =
       order?.carCards.map((carCard) => {
         const model = carCard.specifications.find(
@@ -313,9 +369,17 @@ bot.on("callback_query:data", async (ctx) => {
           generateUserLink(`${order?.user.tgId}`, order?.user.username),
         ),
       ],
+      // [
+      //   ...(order?.user.phoneNumber
+      //     ? [InlineKeyboard.text(order.user.phoneNumber, "copy_text")]
+      //     : []),
+      // ],
     ]);
 
-    await ctx.editMessageText(editMessageText, { reply_markup: buttons });
+    await ctx.editMessageText(editMessageText, {
+      reply_markup: buttons,
+      parse_mode: "Markdown",
+    });
 
     await ctx.reply(
       `Менеджер ${ctx.from.first_name} @${ctx.from.username} принял заявку №${orderId}`,

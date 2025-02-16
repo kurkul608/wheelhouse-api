@@ -26,6 +26,7 @@ model User {
   username       String?
   firstName      String?
   lastName       String?
+  phoneNumber    String?
   languageCode   String?
   roles          UserRole[] @default([USER])
   client_orders  Order[]    @relation("Client")

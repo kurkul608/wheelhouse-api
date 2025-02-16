@@ -9,14 +9,18 @@ import {
 
 export const getByTgIdUserService = async (
   userTgId: number,
+  clearCache?: boolean,
 ): Promise<Prisma.UserGetPayload<any> | null> => {
   try {
     const cacheKey = `user:userTgId-${userTgId}`;
 
     const cachedData = await redisClient.get(cacheKey);
-    if (cachedData) {
+    if (cachedData && !clearCache) {
       console.log("Cache getByTgIdUserService hit");
       return JSON.parse(cachedData);
+    }
+    if (clearCache) {
+      await redisClient.del(cacheKey);
     }
     const user = await prisma.user.findUnique({ where: { tgId: userTgId } });
 
