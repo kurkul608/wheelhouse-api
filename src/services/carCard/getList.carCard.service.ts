@@ -160,9 +160,6 @@ export const getListCarCardService = async ({
   });
 
   const currentPage = offset / limit + 1;
-  console.log("count: ", count);
-  console.log("currentPage: ", currentPage);
-  console.log("currentPage * limit: ", currentPage * limit);
 
   const result = {
     items: carCards,
