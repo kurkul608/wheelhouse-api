@@ -345,7 +345,7 @@ bot.on("callback_query:data", async (ctx) => {
 
     const messageId = ctx.callbackQuery.message!.message_id;
 
-    const editMessageText = `Пользователь ${order?.user.firstName ?? ""} ${order?.user.lastName ?? ""} @${ctx.from.username ?? ""}\n\nОтветственный менеджер ${manager.firstName} @${manager.username}
+    const editMessageText = `Пользователь ${order?.user.firstName ?? ""} ${order?.user.lastName ?? ""} @${order?.user.username ?? ""}\n\nОтветственный менеджер ${manager.firstName} @${manager.username}
     Номер телефона пользавтеля -   \`${order?.user.phoneNumber}\`
     
     ЕСЛИ КНОПКА ОТКРЫТЬ ПОЛЬЗОВАТЕЛЯ НЕ РАБОТАЕТ, ТО НУЖНО СВЯЗАТЬСЯ С КЛИНЕТОМ ПРИ ПОМОЩИ ТЕЛЕФОНА
