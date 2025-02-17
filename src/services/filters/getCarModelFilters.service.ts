@@ -31,6 +31,7 @@ export const getCarModelFiltersService = async (
       const values = (
         await prisma.carCard.findMany({
           where: {
+            isActive: true,
             specifications: {
               some: {
                 field: "model",

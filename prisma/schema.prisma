@@ -79,6 +79,8 @@ model CarCard {
   externalId     String?
   inStock        Boolean         @default(false)
   specifications Specification[]
+  carModel       String?
+  carBrand       String?
   photos         File[]
   importedPhotos String[]
   description    String

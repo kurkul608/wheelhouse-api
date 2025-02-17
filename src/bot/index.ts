@@ -21,6 +21,7 @@ import { getByFilenameVideoService } from "../services/video/getByFilename.video
 import { createVideoService } from "../services/video/create.video.service";
 import { openaiClient } from "../openai";
 import { deleteEmptyCarCardService } from "../services/carCard/deleteEmpty.carCard.service";
+import { updateCarCardBrands } from "../services/admin/updateCarCardBrands";
 
 dotenv.config();
 
@@ -319,6 +320,27 @@ bot.command("contact", async (ctx) => {
   }
 });
 
+bot.command("updatebrands", async (ctx) => {
+  try {
+    const user = await getByTgIdUserService(ctx.from!.id);
+    if (!user || !user.roles.includes(UserRole.SUPER_ADMIN)) {
+      await ctx.reply("У вас нет прав на этот функционал");
+      return;
+    }
+
+    await ctx.reply("Начат процесс обновления автомобилей");
+    updateCarCardBrands()
+      .then(async () => {
+        await ctx.reply("Процесс обновления авто успешно окончен");
+      })
+      .catch(async () => {
+        await ctx.reply("Произошла ошибка");
+      });
+  } catch (error) {
+    console.error("updating data error: ", error);
+    await ctx.reply("Произошла ошибка");
+  }
+});
 // bot.on("message:contact", async (ctx) => {
 //   const contact = ctx.message.contact;
 //   console.log(JSON.stringify(contact));
