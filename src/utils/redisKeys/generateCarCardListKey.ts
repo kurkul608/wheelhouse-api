@@ -1,6 +1,6 @@
 import { GetListCarCardParams } from "../../services/carCard/getList.carCard.service";
 
-export const CAR_CARD_LIST_PREFIX = "carCards-20250216:";
+export const CAR_CARD_LIST_PREFIX = "carCards-20250216-update-filters:";
 
 export const generateCarCardListKey = ({
   inStock,

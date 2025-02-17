@@ -1,7 +1,6 @@
 import prisma from "../../prisma";
 import { CACHE_TTL, redisClient } from "../../redisClient/idnex";
 import { generateCarCardListKey } from "../../utils/redisKeys/generateCarCardListKey";
-import { parseCarCardListKey } from "../../utils/redisKeys/parseCarCardListKey";
 import { Prisma } from "@prisma/client";
 
 export type GetListCarCardParams = {
@@ -65,44 +64,24 @@ export const getListCarCardService = async ({
   ) {
     if (carBrandFilter && carBrandFilter.length) {
       andConditions.push({
-        specifications: {
-          some: {
-            OR: carBrandFilter.map((brand) => ({
-              field: "model",
-              value: { contains: brand, mode: "insensitive" },
-            })),
-          },
-        },
+        OR: carBrandFilter.map((brand: string) => ({
+          carBrand: { contains: brand, mode: "insensitive" },
+        })),
       });
     }
     if (carModelFilter && carModelFilter.length) {
       andConditions.push({
-        specifications: {
-          some: {
-            OR: carModelFilter.map((model) => ({
-              field: "specification",
-              value: { contains: model, mode: "insensitive" },
-            })),
-          },
-        },
+        OR: carModelFilter.map((model: string) => ({
+          carModel: { contains: model, mode: "insensitive" },
+        })),
       });
     }
   } else if (searchString) {
     andConditions.push({
-      specifications: {
-        some: {
-          OR: [
-            {
-              field: "model",
-              value: { contains: searchString, mode: "insensitive" },
-            },
-            {
-              field: "specification",
-              value: { contains: searchString, mode: "insensitive" },
-            },
-          ],
-        },
-      },
+      OR: [
+        { carBrand: { contains: searchString, mode: "insensitive" } },
+        { carModel: { contains: searchString, mode: "insensitive" } },
+      ],
     });
   }
 
@@ -115,12 +94,7 @@ export const getListCarCardService = async ({
       yearCondition.lte = maxDateFilter.toString();
     }
     andConditions.push({
-      specifications: {
-        some: {
-          field: "year",
-          value: yearCondition,
-        },
-      },
+      carYear: yearCondition,
     });
   }
 
@@ -133,7 +107,6 @@ export const getListCarCardService = async ({
     take: limit,
     include: {
       photos: true,
-      specifications: { select: { field: true, fieldName: true, value: true } },
     },
     where: whereConditions,
     ...(sortOrder && sortBy
