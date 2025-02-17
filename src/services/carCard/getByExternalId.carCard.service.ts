@@ -2,7 +2,7 @@ import prisma from "../../prisma";
 import { Prisma } from "@prisma/client";
 
 export const getByExternalIdCarCardService = async (
-  externalId?: string,
+  externalId: string,
 ): Promise<Prisma.CarCardGetPayload<{
   include: { specifications: true };
 }> | null> => {

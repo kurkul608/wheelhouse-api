@@ -1,6 +1,7 @@
 import prisma from "../../prisma";
 import { Prisma } from "@prisma/client";
 import { ONE_MONTH_CACHE_TTL, redisClient } from "../../redisClient/idnex";
+import { generateWishlistKey } from "../../utils/redisKeys/generateWishlistKey";
 
 export async function createWishlistService(
   userId: string,
@@ -20,7 +21,7 @@ export async function createWishlistService(
       },
     });
 
-    const cacheKey = `wishlist:userId-${userId}`;
+    const cacheKey = generateWishlistKey(userId);
 
     await redisClient.set(
       cacheKey,

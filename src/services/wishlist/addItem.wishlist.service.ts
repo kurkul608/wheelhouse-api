@@ -1,15 +1,8 @@
 import prisma from "../../prisma";
-import { ONE_MONTH_CACHE_TTL, redisClient } from "../../redisClient/idnex";
+import { getByUserWishlist } from "./getByUser.wishlist";
 
 export async function addItemToWishlist(userId: string, carCardId: string) {
   try {
-    const cacheKey = `wishlist:userId-${userId}`;
-
-    const cachedData = await redisClient.get(cacheKey);
-    if (cachedData) {
-      await redisClient.del(cacheKey);
-    }
-
     const [wishlist, carCard] = await Promise.all([
       prisma.wishlist.findUnique({ where: { userId } }),
       prisma.carCard.findUnique({ where: { id: carCardId } }),
@@ -36,21 +29,7 @@ export async function addItemToWishlist(userId: string, carCardId: string) {
       },
     });
 
-    const updatedWishlist = await prisma.wishlist.findUnique({
-      where: { userId },
-      include: {
-        carCards: {
-          include: { specifications: true },
-        },
-      },
-    });
-
-    await redisClient.set(
-      cacheKey,
-      JSON.stringify(updatedWishlist),
-      "EX",
-      ONE_MONTH_CACHE_TTL,
-    );
+    const updatedWishlist = await getByUserWishlist(userId, true);
 
     return updatedWishlist;
   } catch (error) {

@@ -22,6 +22,7 @@ import { createVideoService } from "../services/video/create.video.service";
 import { openaiClient } from "../openai";
 import { deleteEmptyCarCardService } from "../services/carCard/deleteEmpty.carCard.service";
 import { updateCarCardBrands } from "../services/admin/updateCarCardBrands";
+import { removeCarCardDuplicatesService } from "../services/duplicates/removeCarCardDuplicates.service";
 
 dotenv.config();
 
@@ -341,11 +342,33 @@ bot.command("updatebrands", async (ctx) => {
     await ctx.reply("Произошла ошибка");
   }
 });
-// bot.on("message:contact", async (ctx) => {
-//   const contact = ctx.message.contact;
-//   console.log(JSON.stringify(contact));
-//   await ctx.reply(`Спасибо! Ваш номер телефона: ${contact.phone_number}`);
-// });
+
+bot.command("duplicates", async (ctx) => {
+  try {
+    const user = await getByTgIdUserService(ctx.from!.id);
+    if (!user || !user.roles.includes(UserRole.SUPER_ADMIN)) {
+      await ctx.reply("У вас нет прав на этот функционал");
+      return;
+    }
+
+    await ctx.reply("Начат процесс удаления дубликатов");
+    removeCarCardDuplicatesService()
+      .then(async (data) => {
+        await ctx.reply("Процесс удаления дубликатов успешно окончен");
+        for (const duplicate of data) {
+          await ctx.reply(
+            `ID ${duplicate[0]}, количество дубликатов - ${duplicate[1]}`,
+          );
+        }
+      })
+      .catch(async () => {
+        await ctx.reply("Произошла ошибка во время обновления дубликатов");
+      });
+  } catch (error) {
+    console.error("updating data error: ", error);
+    await ctx.reply("Произошла ошибка во время обновления дубликатов");
+  }
+});
 
 bot.on("callback_query:data", async (ctx) => {
   const callbackData = ctx.callbackQuery.data;
