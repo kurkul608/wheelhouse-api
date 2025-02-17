@@ -2,6 +2,8 @@ import { Prisma } from "@prisma/client";
 import prisma from "../../prisma";
 import { updateListCacheCarCardService } from "../carCard/updateListCache.carCard.service";
 import { updateCarCacheCarCardService } from "../carCard/updateCarCache.carCard.service";
+import { updateCarCardBrands } from "../admin/updateCarCardBrands";
+import { updateCarCardService } from "../carCard/update.carCard.service";
 
 export const createSpecificationService = async (
   specificationDto: Prisma.SpecificationCreateInput,
@@ -10,13 +12,25 @@ export const createSpecificationService = async (
     data: { ...specificationDto },
   });
 
+  const carCardId = (specificationDto as unknown as { carCardId: string })
+    .carCardId;
+
+  if (specificationDto.field === "model") {
+    await updateCarCardService(carCardId, { carBrand: specificationDto.value });
+  }
+  if (specificationDto.field === "specification") {
+    await updateCarCardService(carCardId, { carModel: specificationDto.value });
+  }
+  if (specificationDto.field === "year") {
+    await updateCarCardService(carCardId, { carYear: specificationDto.value });
+  }
+
   updateListCacheCarCardService().catch((err) => {
     console.error("Ошибка при обработке ключей:", err);
   });
-  if ((specificationDto as unknown as { carCardId: string }).carCardId) {
-    updateCarCacheCarCardService(
-      (specificationDto as unknown as { carCardId: string }).carCardId,
-    ).catch((err) => {
+
+  if (carCardId) {
+    updateCarCacheCarCardService(carCardId).catch((err) => {
       console.error("Ошибка при обработке ключей:", err);
     });
   }

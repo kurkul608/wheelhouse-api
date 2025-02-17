@@ -3,7 +3,6 @@ import {
   getCarBrandsFiltersService,
 } from "./getCarBrandsFilters.service";
 import prisma from "../../prisma";
-import { Prisma } from "@prisma/client";
 import _ from "lodash";
 import { generateCarModelsFiltersKey } from "../../utils/redisKeys/generateCarModelsFiltersKey";
 import { ONE_WEEK_CACHE_TTL, redisClient } from "../../redisClient/idnex";
@@ -28,28 +27,16 @@ export const getCarModelFiltersService = async (
     const brands = (await getCarBrandsFiltersService()).map((opt) => opt.value);
     const modelsByBrands: Partial<Record<CarBrandsFilterType, string[]>> = {};
     for (const brand of brands) {
-      const values = (
+      const values: string[] = (
         await prisma.carCard.findMany({
           where: {
             isActive: true,
-            specifications: {
-              some: {
-                field: "model",
-                value: { contains: brand, mode: "insensitive" },
-              },
-            },
+            carBrand: { contains: brand, mode: "insensitive" },
           },
-          select: { specifications: { select: { value: true, field: true } } },
         })
       )
-        .reduce(
-          (acc, car) => [...acc, ...car.specifications],
-          [] as Prisma.SpecificationGetPayload<{
-            select: { value: true; field: true };
-          }>[],
-        )
-        .filter((spec) => spec.field === "specification")
-        .map((spec) => spec.value);
+        .filter((car) => !!car.carModel)
+        .map((car) => car.carModel as string);
       modelsByBrands[brand] = uniqueCaseInsensitive(values);
     }
 
