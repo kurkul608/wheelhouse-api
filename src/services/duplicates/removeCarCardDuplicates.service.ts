@@ -20,15 +20,29 @@ export const removeCarCardDuplicatesService = async () => {
       },
       {} as Record<string, typeof carCards>,
     );
-    const duplicates: Array<[string, number]> = [];
+    // const duplicates: Array<[string, number]> = [];
 
     for (const externalId in grouped) {
       const cards = grouped[externalId];
       if (cards.length > 1) {
-        duplicates.push([cards[0].externalId || "", cards.length]);
+        // duplicates.push([cards[0].externalId || "", cards.length]);
+
+        const cardToKeep = cards[0];
+        const duplicates = cards.slice(1);
+
+        for (const duplicate of duplicates) {
+          await prisma.specification.deleteMany({
+            where: { carCardId: duplicate.id },
+          });
+
+          await prisma.carCard.delete({
+            where: { id: duplicate.id },
+          });
+        }
       }
     }
-    return duplicates;
+
+    // return duplicates;
   } catch (error) {
     console.error(error);
     throw error;

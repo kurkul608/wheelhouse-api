@@ -76,7 +76,7 @@ enum FiatAsset {
 
 model CarCard {
   id             String          @id @default(auto()) @map("_id") @db.ObjectId
-  externalId     String?
+  externalId     String?         @unique
   inStock        Boolean         @default(false)
   specifications Specification[]
   carModel       String?

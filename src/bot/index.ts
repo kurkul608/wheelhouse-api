@@ -353,13 +353,13 @@ bot.command("duplicates", async (ctx) => {
 
     await ctx.reply("Начат процесс удаления дубликатов");
     removeCarCardDuplicatesService()
-      .then(async (data) => {
+      .then(async () => {
         await ctx.reply("Процесс удаления дубликатов успешно окончен");
-        for (const duplicate of data) {
-          await ctx.reply(
-            `ID ${duplicate[0]}, количество дубликатов - ${duplicate[1]}`,
-          );
-        }
+        // for (const duplicate of data) {
+        //   await ctx.reply(
+        //     `ID ${duplicate[0]}, количество дубликатов - ${duplicate[1]}`,
+        //   );
+        // }
       })
       .catch(async () => {
         await ctx.reply("Произошла ошибка во время обновления дубликатов");
