@@ -158,7 +158,7 @@ export const getListCarCardService = async ({
         }
       : {}),
   });
-
+  console.log("whereConditions: ", JSON.stringify(whereConditions));
   const currentPage = offset / limit + 1;
 
   const result = {
