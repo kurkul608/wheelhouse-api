@@ -23,6 +23,7 @@ import { openaiClient } from "../openai";
 import { deleteEmptyCarCardService } from "../services/carCard/deleteEmpty.carCard.service";
 import { updateCarCardBrands } from "../services/admin/updateCarCardBrands";
 import { removeCarCardDuplicatesService } from "../services/duplicates/removeCarCardDuplicates.service";
+import { updateListCacheCarCardService } from "../services/carCard/updateListCache.carCard.service";
 
 dotenv.config();
 
@@ -355,11 +356,9 @@ bot.command("duplicates", async (ctx) => {
     removeCarCardDuplicatesService()
       .then(async () => {
         await ctx.reply("Процесс удаления дубликатов успешно окончен");
-        // for (const duplicate of data) {
-        //   await ctx.reply(
-        //     `ID ${duplicate[0]}, количество дубликатов - ${duplicate[1]}`,
-        //   );
-        // }
+        updateListCacheCarCardService().catch(async () => {
+          await ctx.reply("Произошла ошибка во время обновления списков");
+        });
       })
       .catch(async () => {
         await ctx.reply("Произошла ошибка во время обновления дубликатов");
