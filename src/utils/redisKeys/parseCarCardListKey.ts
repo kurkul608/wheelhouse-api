@@ -3,7 +3,7 @@ import { GetListCarCardParams } from "../../services/carCard/getList.carCard.ser
 export const parseCarCardListKey = (key: string): GetListCarCardParams => {
   const parts = key.split(":");
 
-  if (parts.length !== 11 || parts[0] !== "carCards") {
+  if (parts.length !== 11 || !parts[0].includes("carCards")) {
     throw new Error("Invalid key format");
   }
 

@@ -13,7 +13,13 @@ export const removePhotoFromCarCard = async (
     const cacheKey = generateCarCardKey(carCardId);
     const carCard = await prisma.carCard.findUnique({
       where: { id: carCardId },
-      include: { photos: true },
+      include: {
+        photos: {
+          orderBy: {
+            weight: "asc",
+          },
+        },
+      },
     });
 
     if (!carCard) {

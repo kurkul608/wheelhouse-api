@@ -4,31 +4,29 @@ import { CACHE_TTL, redisClient } from "../../redisClient/idnex";
 import { updateListCacheCarCardService } from "./updateListCache.carCard.service";
 import { generateCarCardKey } from "../../utils/redisKeys/generateCarCardKey";
 import { updateCarCacheCarCardService } from "./updateCarCache.carCard.service";
+import { updateFileService } from "../file/update.file.service";
+import { getCarCardService } from "./get.carCard.service";
 
 export const updateCarCardService = async (
   carCarId: string,
-  data: Prisma.CarCardUpdateInput,
+  { photosIds, ...data }: Prisma.CarCardUpdateInput & { photosIds?: string[] },
 ): Promise<Prisma.CarCardGetPayload<any> | null> => {
   const cacheKey = generateCarCardKey(carCarId);
 
   try {
     await prisma.carCard.update({ where: { id: carCarId }, data: data });
 
+    if (photosIds) {
+      for (const photoId of photosIds) {
+        const index = photosIds.indexOf(photoId);
+        await updateFileService(photoId, { weight: index });
+      }
+    }
+
     const cachedData = await redisClient.get(cacheKey);
     if (cachedData) {
       await redisClient.del(cacheKey);
     }
-
-    const carCard = await prisma.carCard.findFirst({
-      where: { id: carCarId },
-      include: {
-        photos: true,
-        specifications: {
-          select: { field: true, fieldName: true, value: true, id: true },
-        },
-      },
-    });
-    await redisClient.set(cacheKey, JSON.stringify(carCard), "EX", CACHE_TTL);
 
     updateListCacheCarCardService().catch((err) => {
       console.error("Ошибка при обработке ключей:", err);

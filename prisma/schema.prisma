@@ -105,6 +105,7 @@ model File {
   file_size Int
   key       String
   bucket    String
+  weight    Int?
   CarCard   CarCard? @relation(fields: [carCardId], references: [id])
   carCardId String?  @db.ObjectId
   createdAt DateTime @default(now())

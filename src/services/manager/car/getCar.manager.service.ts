@@ -8,7 +8,11 @@ export const getCarManagerService = async (
     const carCard = await prisma.carCard.findUnique({
       where: { id },
       include: {
-        photos: true,
+        photos: {
+          orderBy: {
+            weight: "asc",
+          },
+        },
         specifications: {
           select: { field: true, fieldName: true, value: true, id: true },
         },

@@ -18,6 +18,7 @@ interface CreateCarCardBody {
   price?: string;
   currency?: string;
   isActive: boolean;
+  photosIds?: string[];
 }
 
 interface DeleteCarCardFileParams {
@@ -151,6 +152,7 @@ export async function managerCarsRoutes(fastify: FastifyInstance) {
             price: { type: "string" },
             currency: { type: "string" },
             isActive: { type: "boolean" },
+            photosIds: { type: "array" },
           },
           required: [],
         },
