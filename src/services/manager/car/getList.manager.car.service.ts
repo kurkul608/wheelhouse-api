@@ -16,31 +16,29 @@ export const getListManagerCarService = async ({
       isActive,
     };
 
-    if (searchString) {
-      whereConditions.specifications = {
-        some: {
-          OR: [
-            {
-              field: "model",
-              value: { contains: searchString, mode: "insensitive" },
-            },
-            {
-              field: "specification",
-              value: { contains: searchString, mode: "insensitive" },
-            },
-          ],
-        },
-      };
-    }
-
     const cars = await prisma.carCard.findMany({
-      include: { specifications: true, photos: true },
-      where: whereConditions,
+      include: { photos: true },
+      where: {
+        inStock,
+        isActive,
+        OR: [
+          {
+            carModel: {
+              contains: searchString,
+              mode: "insensitive",
+            },
+          },
+          {
+            carBrand: {
+              contains: searchString,
+              mode: "insensitive",
+            },
+          },
+        ],
+      },
       orderBy: {
         createdAt: "desc",
       },
-      // skip: offset,
-      // take: limit,
     });
 
     return cars;
