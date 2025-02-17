@@ -60,52 +60,50 @@ export const getListCarCardService = async ({
   const andConditions: any[] = [];
 
   if (
-    searchString ||
     (carBrandFilter && carBrandFilter.length) ||
     (carModelFilter && carModelFilter.length)
   ) {
-    const orConditions: any[] = [];
-
-    if (searchString) {
-      orConditions.push(
-        {
-          field: "model",
-          value: { contains: searchString, mode: "insensitive" },
-        },
-        {
-          field: "specification",
-          value: { contains: searchString, mode: "insensitive" },
-        },
-      );
-    }
-
     if (carBrandFilter && carBrandFilter.length) {
-      carBrandFilter.forEach((brand) => {
-        orConditions.push({
-          field: "model",
-          value: { contains: brand, mode: "insensitive" },
-        });
-      });
-    }
-
-    if (carModelFilter && carModelFilter.length) {
-      carModelFilter.forEach((model) => {
-        orConditions.push({
-          field: "specification",
-          value: { contains: model, mode: "insensitive" },
-        });
-      });
-    }
-
-    if (orConditions.length) {
       andConditions.push({
         specifications: {
           some: {
-            OR: orConditions,
+            OR: carBrandFilter.map((brand) => ({
+              field: "model",
+              value: { contains: brand, mode: "insensitive" },
+            })),
           },
         },
       });
     }
+    if (carModelFilter && carModelFilter.length) {
+      andConditions.push({
+        specifications: {
+          some: {
+            OR: carModelFilter.map((model) => ({
+              field: "specification",
+              value: { contains: model, mode: "insensitive" },
+            })),
+          },
+        },
+      });
+    }
+  } else if (searchString) {
+    andConditions.push({
+      specifications: {
+        some: {
+          OR: [
+            {
+              field: "model",
+              value: { contains: searchString, mode: "insensitive" },
+            },
+            {
+              field: "specification",
+              value: { contains: searchString, mode: "insensitive" },
+            },
+          ],
+        },
+      },
+    });
   }
 
   if (minDateFilter || maxDateFilter) {
@@ -116,7 +114,6 @@ export const getListCarCardService = async ({
     if (maxDateFilter) {
       yearCondition.lte = maxDateFilter.toString();
     }
-
     andConditions.push({
       specifications: {
         some: {
@@ -158,7 +155,6 @@ export const getListCarCardService = async ({
         }
       : {}),
   });
-  console.log("whereConditions: ", JSON.stringify(whereConditions));
   const currentPage = offset / limit + 1;
 
   const result = {
