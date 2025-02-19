@@ -344,6 +344,28 @@ bot.command("updatebrands", async (ctx) => {
   }
 });
 
+bot.command("updatecache", async (ctx) => {
+  try {
+    const user = await getByTgIdUserService(ctx.from!.id);
+    if (!user || !user.roles.includes(UserRole.SUPER_ADMIN)) {
+      await ctx.reply("У вас нет прав на этот функционал");
+      return;
+    }
+
+    await ctx.reply("Начат процесс обновления кэша");
+    updateListCacheCarCardService()
+      .then(async () => {
+        await ctx.reply("Процесс обновления кэша");
+      })
+      .catch(async () => {
+        await ctx.reply("Произошла ошибка");
+      });
+  } catch (error) {
+    console.error("updating data error: ", error);
+    await ctx.reply("Произошла ошибка");
+  }
+});
+
 bot.command("duplicates", async (ctx) => {
   try {
     const user = await getByTgIdUserService(ctx.from!.id);
