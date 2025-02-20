@@ -395,7 +395,9 @@ bot.on("callback_query:data", async (ctx) => {
   const callbackData = ctx.callbackQuery.data;
 
   if (callbackData.startsWith("accept-order")) {
+    console.log("in if");
     const orderId = callbackData.replace("accept-order", "");
+    console.log("orderId: ", orderId);
     const order = await getOrderWithUserAndCars(orderId);
     const manager = await getByTgIdUserService(ctx.from!.id);
     if (!manager?.roles.some((role) => role === "MANAGER")) {
@@ -406,8 +408,10 @@ bot.on("callback_query:data", async (ctx) => {
 
       return;
     }
+    console.log("before addManagerOrderService");
 
     await addManagerOrderService(orderId, manager.id);
+    console.log("after addManagerOrderService");
 
     const messageId = ctx.callbackQuery.message!.message_id;
 
@@ -416,6 +420,7 @@ bot.on("callback_query:data", async (ctx) => {
     
     ЕСЛИ КНОПКА ОТКРЫТЬ ПОЛЬЗОВАТЕЛЯ НЕ РАБОТАЕТ, ТО НУЖНО СВЯЗАТЬСЯ С КЛИНЕТОМ ПРИ ПОМОЩИ ТЕЛЕФОНА
     ЧТОБЫ СКОПИРОВАТЬ НОМЕР ТЕЛЕФОНА НАЖМИТЕ НА НЕГО!`;
+    console.log("before carsInlineButtons");
     const carsInlineButtons =
       order?.carCards.map((carCard) => {
         const model = carCard.specifications.find(
@@ -441,6 +446,7 @@ bot.on("callback_query:data", async (ctx) => {
       //     : []),
       // ],
     ]);
+    console.log("before edit");
 
     await ctx.editMessageText(editMessageText, {
       reply_markup: buttons,
