@@ -24,6 +24,9 @@ export const createSpecificationService = async (
   if (specificationDto.field === "year") {
     await updateCarCardService(carCardId, { carYear: specificationDto.value });
   }
+  if (specificationDto.field === "vin") {
+    await updateCarCardService(carCardId, { carVin: specificationDto.value });
+  }
 
   updateListCacheCarCardService().catch((err) => {
     console.error("Ошибка при обработке ключей:", err);
