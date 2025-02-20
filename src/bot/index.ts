@@ -417,9 +417,7 @@ bot.on("callback_query:data", async (ctx) => {
 
     const editMessageText = `Пользователь ${order?.user.firstName ?? ""} ${order?.user.lastName ?? ""} @${order?.user.username ?? ""}\n\nОтветственный менеджер ${manager.firstName} @${manager.username}
     Номер телефона пользавтеля -   \`${order?.user.phoneNumber}\`
-    
-    ЕСЛИ КНОПКА ОТКРЫТЬ ПОЛЬЗОВАТЕЛЯ НЕ РАБОТАЕТ, ТО НУЖНО СВЯЗАТЬСЯ С КЛИНЕТОМ ПРИ ПОМОЩИ ТЕЛЕФОНА
-    ЧТОБЫ СКОПИРОВАТЬ НОМЕР ТЕЛЕФОНА НАЖМИТЕ НА НЕГО!`;
+`;
     console.log("before carsInlineButtons");
     const carsInlineButtons =
       order?.carCards.map((carCard) => {
@@ -449,10 +447,14 @@ bot.on("callback_query:data", async (ctx) => {
     console.log("before edit");
     console.log("editMessageText: ", editMessageText);
 
+    const replyNotifyMessage =
+      "ЕСЛИ КНОПКА ОТКРЫТЬ ПОЛЬЗОВАТЕЛЯ НЕ РАБОТАЕТ, ТО НУЖНО СВЯЗАТЬСЯ С КЛИНЕТОМ ПРИ ПОМОЩИ ТЕЛЕФОНА\n    ЧТОБЫ СКОПИРОВАТЬ НОМЕР ТЕЛЕФОНА НАЖМИТЕ НА НЕГО!";
+
     await ctx.editMessageText(editMessageText, {
       reply_markup: buttons,
       parse_mode: "Markdown",
     });
+    await ctx.reply(replyNotifyMessage, { reply_to_message_id: messageId });
 
     await ctx.reply(
       `Менеджер ${ctx.from.first_name} @${ctx.from.username} принял заявку №${orderId}`,
