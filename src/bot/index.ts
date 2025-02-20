@@ -395,9 +395,7 @@ bot.on("callback_query:data", async (ctx) => {
   const callbackData = ctx.callbackQuery.data;
 
   if (callbackData.startsWith("accept-order")) {
-    console.log("in if");
     const orderId = callbackData.replace("accept-order", "");
-    console.log("orderId: ", orderId);
     const order = await getOrderWithUserAndCars(orderId);
     const manager = await getByTgIdUserService(ctx.from!.id);
     if (!manager?.roles.some((role) => role === "MANAGER")) {
@@ -408,17 +406,17 @@ bot.on("callback_query:data", async (ctx) => {
 
       return;
     }
-    console.log("before addManagerOrderService");
 
     await addManagerOrderService(orderId, manager.id);
-    console.log("after addManagerOrderService");
 
     const messageId = ctx.callbackQuery.message!.message_id;
 
     const editMessageText = `Пользователь ${order?.user.firstName ?? ""} ${order?.user.lastName ?? ""} @${order?.user.username ?? ""}\n\nОтветственный менеджер ${manager.firstName} @${manager.username}
     Номер телефона пользавтеля -   \`${order?.user.phoneNumber}\`
-`;
-    console.log("before carsInlineButtons");
+    
+    ЕСЛИ КНОПКА ОТКРЫТЬ ПОЛЬЗОВАТЕЛЯ НЕ РАБОТАЕТ, ТО НУЖНО СВЯЗАТЬСЯ С КЛИНЕТОМ ПРИ ПОМОЩИ ТЕЛЕФОНА
+    ЧТОБЫ СКОПИРОВАТЬ НОМЕР ТЕЛЕФОНА НАЖМИТЕ НА НЕГО!`;
+
     const carsInlineButtons =
       order?.carCards.map((carCard) => {
         const model = carCard.specifications.find(
@@ -438,23 +436,13 @@ bot.on("callback_query:data", async (ctx) => {
           generateUserLink(`${order?.user.tgId}`, order?.user.username),
         ),
       ],
-      // [
-      //   ...(order?.user.phoneNumber
-      //     ? [InlineKeyboard.text(order.user.phoneNumber, "copy_text")]
-      //     : []),
-      // ],
     ]);
-    console.log("before edit");
-    console.log("editMessageText: ", editMessageText);
+    const escapedText = editMessageText.replace(/_/g, "\\_");
 
-    const replyNotifyMessage =
-      "ЕСЛИ КНОПКА ОТКРЫТЬ ПОЛЬЗОВАТЕЛЯ НЕ РАБОТАЕТ, ТО НУЖНО СВЯЗАТЬСЯ С КЛИНЕТОМ ПРИ ПОМОЩИ ТЕЛЕФОНА\n    ЧТОБЫ СКОПИРОВАТЬ НОМЕР ТЕЛЕФОНА НАЖМИТЕ НА НЕГО!";
-
-    await ctx.editMessageText(editMessageText, {
+    await ctx.editMessageText(escapedText, {
       reply_markup: buttons,
       parse_mode: "Markdown",
     });
-    await ctx.reply(replyNotifyMessage, { reply_to_message_id: messageId });
 
     await ctx.reply(
       `Менеджер ${ctx.from.first_name} @${ctx.from.username} принял заявку №${orderId}`,
