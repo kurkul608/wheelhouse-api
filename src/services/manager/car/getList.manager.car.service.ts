@@ -34,6 +34,12 @@ export const getListManagerCarService = async ({
               mode: "insensitive",
             },
           },
+          {
+            carVin: {
+              contains: searchString,
+              mode: "insensitive",
+            },
+          },
         ],
       },
       orderBy: {

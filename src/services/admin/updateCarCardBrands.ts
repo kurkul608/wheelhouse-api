@@ -8,6 +8,7 @@ export const updateCarCardBrands = async () => {
 
     for (const car of carCards) {
       const brand = car.specifications.find((spec) => spec.field === "model");
+      const vin = car.specifications.find((spec) => spec.field === "vin");
       const year = car.specifications.find((spec) => spec.field === "year");
       const model = car.specifications.find(
         (spec) => spec.field === "specification",
@@ -25,6 +26,12 @@ export const updateCarCardBrands = async () => {
         await prisma.carCard.update({
           where: { id: car.id },
           data: { carYear: year.value },
+        });
+      }
+      if (!!vin) {
+        await prisma.carCard.update({
+          where: { id: car.id },
+          data: { carVin: vin.value },
         });
       }
     }

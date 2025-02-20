@@ -82,6 +82,7 @@ model CarCard {
   carModel       String?
   carBrand       String?
   carYear        String?
+  carVin         String?
   photos         File[]
   importedPhotos String[]
   description    String
