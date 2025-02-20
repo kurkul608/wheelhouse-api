@@ -447,6 +447,7 @@ bot.on("callback_query:data", async (ctx) => {
       // ],
     ]);
     console.log("before edit");
+    console.log("editMessageText: ", editMessageText);
 
     await ctx.editMessageText(editMessageText, {
       reply_markup: buttons,
