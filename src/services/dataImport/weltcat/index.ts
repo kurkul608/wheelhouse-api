@@ -87,6 +87,12 @@ export const getAndSaveWeltCarData = async () => {
               );
             }
 
+            const model = specs?.data.find((spec) => spec.field === "model");
+            const specification = specs?.data.find(
+              (spec) => spec.field === "specification",
+            );
+            const year = specs?.data.find((spec) => spec.field === "year");
+
             const carCard = await createExternalCarService({
               currency: parseFiatAsset(weltCar.currency),
               description: specs?.description || "",
@@ -95,7 +101,11 @@ export const getAndSaveWeltCarData = async () => {
               importedPhotos: weltCar.media,
               price: weltCar.price ? String(weltCar.price) : null,
               externalId: externalId,
+              carModel: model?.value ?? weltCar.model,
+              carBrand: specification?.value ?? weltCar.specification,
+              carYear: year?.value ?? String(weltCar.year),
             });
+
             let specifications: Prisma.SpecificationGetPayload<any>[] = [];
             if (specs?.data) {
               specifications = await createManySpecificationService(
