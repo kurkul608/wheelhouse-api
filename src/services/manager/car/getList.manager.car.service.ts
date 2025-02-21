@@ -17,7 +17,13 @@ export const getListManagerCarService = async ({
     };
 
     const cars = await prisma.carCard.findMany({
-      include: { photos: true },
+      include: {
+        photos: {
+          orderBy: {
+            weight: "asc",
+          },
+        },
+      },
       where: {
         inStock,
         isActive,

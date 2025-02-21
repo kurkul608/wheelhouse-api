@@ -106,7 +106,11 @@ export const getListCarCardService = async ({
     skip: offset,
     take: limit,
     include: {
-      photos: true,
+      photos: {
+        orderBy: {
+          weight: "asc",
+        },
+      },
     },
     where: whereConditions,
     ...(sortOrder && sortBy
