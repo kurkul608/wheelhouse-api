@@ -5,6 +5,7 @@ import { createManySpecificationService } from "../../../services/specification/
 import { createSpecificationService } from "../../../services/specification/create.specification.service";
 import { Prisma } from "@prisma/client";
 import { deleteSpecificationService } from "../../../services/specification/delete.specification.service";
+import { trim } from "lodash";
 
 interface CreateSpecificationBody {
   value: string;
@@ -38,9 +39,9 @@ export async function managerSpecificationRoutes(fastify: FastifyInstance) {
         const data = request.body as CreateSpecificationBody;
 
         const specification = await createSpecificationService({
-          field: data.field,
-          fieldName: data.fieldName,
-          value: data.value,
+          field: trim(data.field),
+          fieldName: trim(data.fieldName),
+          value: trim(data.value),
           carCardId: data.carCardId,
         } as unknown as Prisma.SpecificationCreateInput);
 

@@ -8,10 +8,10 @@ import { bot } from "../../bot";
 export const processKey = async (key: string): Promise<void> => {
   const params = parseCarCardListKey(key);
   await redisClient.del(key);
-  const data = await getListCarCardService(params);
-  if (params.inStock) {
-    console.log(data);
-  }
+  await getListCarCardService(params);
+  // if (params.inStock) {
+  //   console.log(data);
+  // }
 };
 
 export const updateListCacheCarCardService = async () => {
