@@ -7,7 +7,7 @@ import {
   Keyboard,
 } from "grammy";
 import dotenv from "dotenv";
-import { UserRole } from "@prisma/client";
+import { UserRole, Video } from "@prisma/client";
 import { createUserService } from "../services/user/create.user.service";
 import { getByTgIdUserService } from "../services/user/getByTgId.user.service";
 import { getOrderWithUserAndCars } from "../services/order/getOrderWithUserAndCars";
@@ -78,7 +78,12 @@ bot.command("start", async (ctx) => {
       "Каталог Zeuse",
       process.env.MINI_APP_URL || "",
     );
-    const startVideoFile = await getByFilenameVideoService("IMG_9760.MP4");
+    let startVideoFile: null | Video = null;
+    try {
+      startVideoFile = await getByFilenameVideoService("IMG_9760.MP4");
+    } catch (error) {
+      console.error(error);
+    }
     const videoDir = path.join(__dirname, "../../video/IMG_9760.MP4");
     const videoFile = new InputFile(videoDir);
     const message = await ctx.replyWithVideo(
