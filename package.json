@@ -14,7 +14,7 @@
     "@fastify/cors": "^10.0.1",
     "@fastify/env": "^5.0.1",
     "@fastify/multipart": "^9.0.1",
-    "@prisma/client": "^6.1.0",
+    "@prisma/client": "^6.4.1",
     "aws-sdk": "^2.1692.0",
     "bottleneck": "^2.19.5",
     "dotenv": "^16.4.5",

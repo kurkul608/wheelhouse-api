@@ -7,7 +7,7 @@ import {
   Keyboard,
 } from "grammy";
 import dotenv from "dotenv";
-import { UserRole, Video } from "@prisma/client";
+import { Prisma, UserRole, Video } from "@prisma/client";
 import { createUserService } from "../services/user/create.user.service";
 import { getByTgIdUserService } from "../services/user/getByTgId.user.service";
 import { getOrderWithUserAndCars } from "../services/order/getOrderWithUserAndCars";
@@ -24,12 +24,20 @@ import { deleteEmptyCarCardService } from "../services/carCard/deleteEmpty.carCa
 import { updateCarCardBrands } from "../services/admin/updateCarCardBrands";
 import { removeCarCardDuplicatesService } from "../services/duplicates/removeCarCardDuplicates.service";
 import { updateListCacheCarCardService } from "../services/carCard/updateListCache.carCard.service";
+import { getRefService } from "../services/ref/get.refService";
 
 dotenv.config();
 
 export const bot = new Bot(process.env.BOT_TOKEN || "", {
   client: { environment: process.env.LOCAL ? "test" : "prod" },
 });
+
+function parseQuery(queryStr: string, key: string) {
+  if (!queryStr) return null;
+  // Если строка выглядит как "key1=value1&key2=value2", используем URLSearchParams
+  const params = new URLSearchParams(queryStr);
+  return params.get(key);
+}
 
 bot.command("start", async (ctx) => {
   try {
@@ -45,18 +53,69 @@ bot.command("start", async (ctx) => {
     //   });
     // }
 
+    const text = ctx.message?.text || "";
+    const parts = text.split(" ");
+    const queryString = parts.length > 1 ? parts.slice(1).join(" ") : "";
+
+    const refId = parseQuery(queryString, "refId");
+
     if (!existUser) {
-      createUserService({
-        tgId: ctx.from!.id,
-        username: ctx.from?.username,
-        firstName: ctx.from?.first_name,
-        lastName: ctx.from?.last_name,
-        languageCode: ctx.from?.language_code,
-        roles: [UserRole.USER],
-      }).catch(async (error) => {
-        console.error(error);
-        await ctx.reply("Произошла ошибка");
-      });
+      if (refId) {
+        getRefService(refId)
+          .then((ref) => {
+            if (ref) {
+              createUserService({
+                tgId: ctx.from!.id,
+                username: ctx.from?.username,
+                firstName: ctx.from?.first_name,
+                lastName: ctx.from?.last_name,
+                languageCode: ctx.from?.language_code,
+                roles: [UserRole.USER],
+                refId: ref.id,
+              } as unknown as Prisma.UserCreateInput).catch(async (error) => {
+                console.error(error);
+                await ctx.reply("Произошла ошибка");
+              });
+            } else {
+              createUserService({
+                tgId: ctx.from!.id,
+                username: ctx.from?.username,
+                firstName: ctx.from?.first_name,
+                lastName: ctx.from?.last_name,
+                languageCode: ctx.from?.language_code,
+                roles: [UserRole.USER],
+              }).catch(async (error) => {
+                console.error(error);
+                await ctx.reply("Произошла ошибка");
+              });
+            }
+          })
+          .catch(() => {
+            createUserService({
+              tgId: ctx.from!.id,
+              username: ctx.from?.username,
+              firstName: ctx.from?.first_name,
+              lastName: ctx.from?.last_name,
+              languageCode: ctx.from?.language_code,
+              roles: [UserRole.USER],
+            }).catch(async (error) => {
+              console.error(error);
+              await ctx.reply("Произошла ошибка");
+            });
+          });
+      } else {
+        createUserService({
+          tgId: ctx.from!.id,
+          username: ctx.from?.username,
+          firstName: ctx.from?.first_name,
+          lastName: ctx.from?.last_name,
+          languageCode: ctx.from?.language_code,
+          roles: [UserRole.USER],
+        }).catch(async (error) => {
+          console.error(error);
+          await ctx.reply("Произошла ошибка");
+        });
+      }
     }
 
     const customEmojiId = "5219767260561823811";
