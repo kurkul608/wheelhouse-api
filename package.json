@@ -24,6 +24,7 @@
     "grammy": "^1.32.0",
     "https-proxy-agent": "^7.0.6",
     "ioredis": "^5.5.0",
+    "json2csv": "^6.0.0-alpha.2",
     "lodash": "^4.17.21",
     "node-schedule": "^2.1.1",
     "openai": "^4.80.1",
@@ -31,6 +32,7 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
+    "@types/json2csv": "^5.0.7",
     "@types/lodash": "^4.17.15",
     "@types/node": "^22.9.1",
     "@types/node-schedule": "^2.1.7",

@@ -3,10 +3,29 @@ import { Ref } from "@prisma/client";
 
 export const getRefService = async (
   refId: string,
-): Promise<Ref | null | undefined> => {
+  expanded?: boolean,
+): Promise<Ref | (Ref & { usersCount: number }) | null | undefined> => {
   try {
     const ref = await prisma.ref.findUnique({ where: { id: refId } });
-    return ref;
+
+    if (!expanded) {
+      return ref;
+    }
+
+    const usersCount = await prisma.user.count({ where: { refId } });
+    const usersWithOrderCount = await prisma.user.count({
+      where: {
+        refId,
+        client_orders: {
+          some: {},
+        },
+      },
+    });
+
+    return { ...ref, usersCount, usersWithOrderCount } as Ref & {
+      usersCount: number;
+      usersWithOrderCount: number;
+    };
   } catch (error) {
     console.error(error);
   }
