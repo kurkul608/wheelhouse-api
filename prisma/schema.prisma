@@ -28,6 +28,7 @@ model User {
   lastName       String?
   phoneNumber    String?
   languageCode   String?
+  clientId       String?
   roles          UserRole[] @default([USER])
   client_orders  Order[]    @relation("Client")
   manager_orders Order[]    @relation("Manager")
