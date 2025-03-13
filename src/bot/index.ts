@@ -25,6 +25,7 @@ import { updateCarCardBrands } from "../services/admin/updateCarCardBrands";
 import { removeCarCardDuplicatesService } from "../services/duplicates/removeCarCardDuplicates.service";
 import { updateListCacheCarCardService } from "../services/carCard/updateListCache.carCard.service";
 import { getRefService } from "../services/ref/get.refService";
+import { updateUserService } from "../services/user/updateUser.service";
 
 dotenv.config();
 
@@ -57,7 +58,7 @@ bot.command("start", async (ctx) => {
     const parts = text.split(" ");
     const queryString = parts.length > 1 ? parts.slice(1).join(" ") : "";
 
-    const id = parseQuery(queryString, "id");
+    const clientId = parseQuery(queryString, "id");
     const refId = parseQuery(queryString, "refId");
 
     if (!existUser) {
@@ -73,7 +74,7 @@ bot.command("start", async (ctx) => {
                 languageCode: ctx.from?.language_code,
                 roles: [UserRole.USER],
                 refId: ref.id,
-                clientId: id,
+                clientId,
               } as unknown as Prisma.UserCreateInput).catch(async (error) => {
                 console.error(error);
                 await ctx.reply("Произошла ошибка");
@@ -86,7 +87,7 @@ bot.command("start", async (ctx) => {
                 lastName: ctx.from?.last_name,
                 languageCode: ctx.from?.language_code,
                 roles: [UserRole.USER],
-                clientId: id,
+                clientId,
               }).catch(async (error) => {
                 console.error(error);
                 await ctx.reply("Произошла ошибка");
@@ -101,7 +102,7 @@ bot.command("start", async (ctx) => {
               lastName: ctx.from?.last_name,
               languageCode: ctx.from?.language_code,
               roles: [UserRole.USER],
-              clientId: id,
+              clientId,
             }).catch(async (error) => {
               console.error(error);
               await ctx.reply("Произошла ошибка");
@@ -115,12 +116,19 @@ bot.command("start", async (ctx) => {
           lastName: ctx.from?.last_name,
           languageCode: ctx.from?.language_code,
           roles: [UserRole.USER],
-          clientId: id,
+          clientId,
         }).catch(async (error) => {
           console.error(error);
           await ctx.reply("Произошла ошибка");
         });
       }
+    }
+
+    if (existUser && clientId && !existUser.clientId) {
+      updateUserService(existUser.id, { clientId }).catch(async (error) => {
+        console.error(error);
+        await ctx.reply("Произошла ошибка");
+      });
     }
 
     const customEmojiId = "5219767260561823811";
