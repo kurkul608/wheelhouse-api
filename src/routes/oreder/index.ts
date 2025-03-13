@@ -6,6 +6,9 @@ import { createOrder } from "../../services/order/create.order";
 import { sendOrderMessageBotService } from "../../services/bot/sendOrderMessage.bot.service";
 import { addMessageOrderService } from "../../services/order/addMessage.order.service";
 import { updateUserService } from "../../services/user/updateUser.service";
+import { getUserService } from "../../services/user/get.user.service";
+import { sendEventToYandexMetrika } from "../../services/sendMetrika/sendMetrika.service";
+import { getCarCardService } from "../../services/carCard/get.carCard.service";
 
 export async function orderRoutes(fastify: FastifyInstance) {
   fastify.addHook("preHandler", authMiddleware);
@@ -67,6 +70,21 @@ export async function orderRoutes(fastify: FastifyInstance) {
         isInquiresAboutPrice,
       );
       await addMessageOrderService(order.id, String(message.message_id));
+
+      getCarCardService(carId).then((carCard) => {
+        if (carCard && user && user.clientId) {
+          sendEventToYandexMetrika({
+            eventType: "event",
+            pageURL: `${process.env.MINI_APP_URL}/order/create/${carCard.id}`,
+            transaction: "create-order",
+            target: carCard.id,
+            price: carCard.price || "",
+            coupon: "",
+            currency: (carCard.currency as string) || "",
+            clientID: user.clientId,
+          });
+        }
+      });
 
       return reply.status(201).send(order);
     },

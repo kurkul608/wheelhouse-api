@@ -5,6 +5,7 @@ import { getByTgIdUserService } from "../../services/user/getByTgId.user.service
 import { getByUserWishlist } from "../../services/wishlist/getByUser.wishlist";
 import { addItemToWishlist } from "../../services/wishlist/addItem.wishlist.service";
 import { deleteItemFromWishlist } from "../../services/wishlist/deleteItem.wishlist.service";
+import { sendEventToYandexMetrika } from "../../services/sendMetrika/sendMetrika.service";
 
 interface GetWishlistByUserParams {
   userId: string;

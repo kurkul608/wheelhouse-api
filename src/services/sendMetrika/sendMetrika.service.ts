@@ -7,19 +7,25 @@ interface MetrikaParams {
 }
 
 interface MetrikaParamsPageView extends MetrikaParams {
+  eventType: "pageview";
   pageURL: string;
   pageTitle: string;
   prevPage: string;
 }
+interface MetrikaParamsEvent extends MetrikaParams {
+  eventType: "event";
+  transaction: string;
+  pageURL?: string;
+  target: string;
+  price: string;
+  coupon: string;
+  currency: string;
+}
 
-export async function sendEventToYandexMetrika({
-  eventType,
-  clientID,
-  pageURL,
-  pageTitle,
-  prevPage,
-}: MetrikaParamsPageView): Promise<void> {
-  if (!clientID) {
+export async function sendEventToYandexMetrika(
+  data: MetrikaParamsPageView | MetrikaParamsEvent,
+): Promise<void> {
+  if (!data.clientID) {
     console.warn("clientID не найден. Событие не отправлено.");
     return;
   }
@@ -33,14 +39,25 @@ export async function sendEventToYandexMetrika({
     console.warn("MS_TOKEN не найден. Событие не отправлено.");
     return;
   }
+  const isPageView = data.eventType === "pageview";
 
   const searchParams = new URLSearchParams({
     tid: process.env.METRIKA_ID,
-    cid: clientID,
-    t: eventType,
-    ...(eventType === "pageview"
-      ? { dr: prevPage || "-", dl: pageURL || "", dt: pageTitle || "" }
-      : {}),
+    cid: data.clientID,
+    t: data.eventType,
+    dl: data.pageURL || "",
+    ...(isPageView
+      ? {
+          dr: data.prevPage || "-",
+          dt: data.pageTitle || "",
+        }
+      : {
+          ea: data.target || "-",
+          ti: data.transaction || "-",
+          tr: data.price || "-",
+          tcc: data.coupon || "-",
+          cu: data.currency || "-",
+        }),
     ms: process.env.MS_TOKEN,
   });
 
