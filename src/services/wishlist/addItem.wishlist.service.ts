@@ -38,8 +38,9 @@ export async function addItemToWishlist(userId: string, carCardId: string) {
         sendEventToYandexMetrika({
           eventType: "event",
           pageURL: `${process.env.MINI_APP_URL}/wishlist/add/${carCardId}`,
-          transaction: "add-to-wishlist",
-          target: carCardId,
+          transaction: carCardId,
+          target: "add-to-wishlist",
+          // target: carCardId,
           price: carCard.price || "",
           coupon: "",
           currency: (carCard.currency as string) || "",

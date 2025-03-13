@@ -76,8 +76,9 @@ export async function orderRoutes(fastify: FastifyInstance) {
           sendEventToYandexMetrika({
             eventType: "event",
             pageURL: `${process.env.MINI_APP_URL}/order/create/${carCard.id}`,
-            transaction: "create-order",
-            target: carCard.id,
+            transaction: carCard.id,
+            // target: carCard.id,
+            target: "create-order",
             price: carCard.price || "",
             coupon: "",
             currency: (carCard.currency as string) || "",
