@@ -24,6 +24,7 @@ server.register(fastifyCors, {
 server.register(fastifyAxios, {
   clients: {
     clientWeltCar: { baseURL: process.env.WELT_CAR_BASE_URL },
+    yandeMetrika: { baseURL: "https://mc.yandex.ru/" },
   },
 });
 

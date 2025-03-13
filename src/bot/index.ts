@@ -26,6 +26,7 @@ import { removeCarCardDuplicatesService } from "../services/duplicates/removeCar
 import { updateListCacheCarCardService } from "../services/carCard/updateListCache.carCard.service";
 import { getRefService } from "../services/ref/get.refService";
 import { updateUserService } from "../services/user/updateUser.service";
+import { sendEventToYandexMetrika } from "../services/sendMetrika/sendMetrika.service";
 
 dotenv.config();
 
@@ -211,6 +212,20 @@ bot.command("channel", async (ctx) => {
     await ctx.reply("Нажми на кнопку для перехода в TG канал", {
       reply_markup: keyboard,
     });
+
+    if (ctx.from && !ctx.from.is_bot) {
+      getByTgIdUserService(ctx.from.id).then((userData) => {
+        if (userData && userData.clientId) {
+          sendEventToYandexMetrika({
+            eventType: "pageview",
+            clientID: userData.clientId,
+            pageTitle: "Команда нажата /channel",
+            pageURL: `${process.env.MINI_APP_URL}/bot-command/chanel`,
+            prevPage: "",
+          });
+        }
+      });
+    }
   } catch (error) {
     console.error(error);
     await ctx.reply("Произошла ошибка");
@@ -226,6 +241,20 @@ bot.command("catalog", async (ctx) => {
     await ctx.reply("Нажми на кнопку для перехода в каталог Zeuse", {
       reply_markup: keyboard,
     });
+
+    if (ctx.from && !ctx.from.is_bot) {
+      getByTgIdUserService(ctx.from.id).then((userData) => {
+        if (userData && userData.clientId) {
+          sendEventToYandexMetrika({
+            eventType: "pageview",
+            clientID: userData.clientId,
+            pageTitle: "Команда нажата /catalog",
+            pageURL: `${process.env.MINI_APP_URL}/bot-command/catalog`,
+            prevPage: "",
+          });
+        }
+      });
+    }
   } catch (error) {
     console.error(error);
     await ctx.reply("Произошла ошибка");
@@ -283,6 +312,20 @@ bot.command("about", async (ctx) => {
         filename: "photo_2025-02-11 08.58.39.jpeg",
       });
     }
+
+    if (ctx.from && !ctx.from.is_bot) {
+      getByTgIdUserService(ctx.from.id).then((userData) => {
+        if (userData && userData.clientId) {
+          sendEventToYandexMetrika({
+            eventType: "pageview",
+            clientID: userData.clientId,
+            pageTitle: "Команда нажата /about",
+            pageURL: `${process.env.MINI_APP_URL}/bot-command/about`,
+            prevPage: "",
+          });
+        }
+      });
+    }
   } catch (error) {
     console.error(error);
     await ctx.reply("Произошла ошибка");
@@ -298,6 +341,20 @@ bot.command("site", async (ctx) => {
     await ctx.reply("Нажми на кнопку для перехода на веб сайт", {
       reply_markup: keyboard,
     });
+
+    if (ctx.from && !ctx.from.is_bot) {
+      getByTgIdUserService(ctx.from.id).then((userData) => {
+        if (userData && userData.clientId) {
+          sendEventToYandexMetrika({
+            eventType: "pageview",
+            clientID: userData.clientId,
+            pageTitle: "Команда нажата /site",
+            pageURL: `${process.env.MINI_APP_URL}/bot-command/site`,
+            prevPage: "",
+          });
+        }
+      });
+    }
   } catch (error) {
     console.error(error);
     await ctx.reply("Произошла ошибка");
@@ -368,6 +425,20 @@ bot.command("exclusive", async (ctx) => {
       await createVideoService({
         fileId: message.video.file_id,
         filename: "IMG_0362.MP4",
+      });
+    }
+
+    if (ctx.from && !ctx.from.is_bot) {
+      getByTgIdUserService(ctx.from.id).then((userData) => {
+        if (userData && userData.clientId) {
+          sendEventToYandexMetrika({
+            eventType: "pageview",
+            clientID: userData.clientId,
+            pageTitle: "Команда нажата /exclusive",
+            pageURL: `${process.env.MINI_APP_URL}/bot-command/exclusive`,
+            prevPage: "",
+          });
+        }
       });
     }
   } catch (error) {
