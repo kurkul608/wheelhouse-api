@@ -132,6 +132,16 @@ bot.command("start", async (ctx) => {
       });
     }
 
+    if (clientId) {
+      sendEventToYandexMetrika({
+        eventType: "pageview",
+        clientID: clientId,
+        pageTitle: "Команда нажата /start с параметром clientId",
+        pageURL: `${process.env.MINI_APP_URL}/bot-command/start`,
+        prevPage: "",
+      });
+    }
+
     const customEmojiId = "5219767260561823811";
     const messageText = `ZeuseBot — ваш личный помощник в мире эксклюзивных авто!
 
