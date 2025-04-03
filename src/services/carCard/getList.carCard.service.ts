@@ -65,8 +65,10 @@ export const getListCarCardService = async ({
     if (carBrandFilter && carBrandFilter.length) {
       andConditions.push({
         OR: carBrandFilter.map((brand: string) => ({
-          carBrand: { contains: brand, mode: "insensitive" },
-          carModel: { contains: brand, mode: "insensitive" },
+          OR: [
+            { carBrand: { contains: brand, mode: "insensitive" } },
+            { carModel: { contains: brand, mode: "insensitive" } },
+          ],
         })),
       });
     }
