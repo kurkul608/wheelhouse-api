@@ -46,10 +46,10 @@ export const getListCarCardService = async ({
   });
 
   const cachedData = await redisClient.get(cacheKey);
-  if (cachedData) {
-    console.log("Cache getListCarCardService hit");
-    return JSON.parse(cachedData);
-  }
+  // if (cachedData) {
+  //   console.log("Cache getListCarCardService hit");
+  //   return JSON.parse(cachedData);
+  // }
 
   const whereConditions: any = {
     isActive: true,
@@ -139,6 +139,8 @@ export const getListCarCardService = async ({
     page: currentPage,
     hasMore: count > currentPage * limit,
   };
+  console.log("carCards.length: ", carCards.length);
+  console.log("whereConditions: ", JSON.stringify(whereConditions));
 
   await redisClient.set(cacheKey, JSON.stringify(result), "EX", CACHE_TTL);
 
