@@ -11,8 +11,20 @@ export async function userRoutes(fastify: FastifyInstance) {
 
   fastify.post(
     "/users/register",
+    {
+      schema: {
+        body: {
+          type: "object",
+          properties: {
+            refId: { type: "string" },
+          },
+        },
+      },
+    },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
+        console.log("in register");
+        const { refId } = request.body as { refId?: string };
         const userTgId = getIdByToken(request.headers.authorization || "");
         const existUser = await getByTgIdUserService(userTgId);
 
@@ -22,13 +34,16 @@ export async function userRoutes(fastify: FastifyInstance) {
 
         const userChat = await bot.api.getChat(userTgId);
 
-        const user = await createUserService({
-          tgId: userTgId,
-          username: userChat.username,
-          firstName: userChat.first_name,
-          lastName: userChat.last_name,
-          roles: [UserRole.USER],
-        });
+        const user = await createUserService(
+          {
+            tgId: userTgId,
+            username: userChat.username,
+            firstName: userChat.first_name,
+            lastName: userChat.last_name,
+            roles: [UserRole.USER],
+          },
+          refId,
+        );
 
         return reply.status(200).send(user);
       } catch (error) {
