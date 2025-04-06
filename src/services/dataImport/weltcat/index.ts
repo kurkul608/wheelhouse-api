@@ -79,7 +79,7 @@ export const getAndSaveWeltCarData = async () => {
           console.log(extendCarCard);
         }
         if (extendCarCard && extendCarCard.specifications.length > 2) {
-          server.log.info(`externalId exist: ${externalId}`);
+          // server.log.info(`externalId exist: ${externalId}`);
           if (!extendCarCard.isActive) {
             await prisma.carCard.update({
               where: { id: extendCarCard.id },
