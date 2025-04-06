@@ -63,6 +63,8 @@ bot.command("start", async (ctx) => {
     const clientId = parseQuery(queryString, "id");
     const refId = parseQuery(queryString, "refId");
 
+    console.log(refId);
+
     if (refId) {
       clickRefService(refId).catch((error) => {
         console.error(error);

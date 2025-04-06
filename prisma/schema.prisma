@@ -171,7 +171,7 @@ model Ref {
   name      String?
   startDate DateTime?
   users     User[]
-  clicks    BigInt?
+  clicks    Int?      @default(0)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 }
