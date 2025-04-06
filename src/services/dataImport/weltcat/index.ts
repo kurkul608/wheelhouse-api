@@ -108,27 +108,27 @@ export const getAndSaveWeltCarData = async () => {
         const year = specs?.data.find((spec) => spec.field === "year");
         const vin = specs?.data.find((spec) => spec.field === "vin");
 
-        const carCard = await createExternalCarService({
-          currency: parseFiatAsset(weltCar.currency),
-          description: specs?.description || "",
-          isActive: true,
-          inStock: false,
-          importedPhotos: weltCar.media,
-          price: weltCar.price ? String(weltCar.price) : null,
-          externalId: externalId,
-          carModel: model?.value ?? weltCar.model,
-          carBrand: specification?.value ?? weltCar.specification,
-          carYear: year?.value ?? String(weltCar.year),
-          carVin: vin?.value ?? String(weltCar.vin),
-        });
-
-        let specifications: Prisma.SpecificationGetPayload<any>[] = [];
-        if (specs?.data) {
-          specifications = await createManySpecificationService(
-            specs.data.map((spec) => ({ ...spec, carCardId: carCard.id })),
-          );
-        }
-        addedCarCards.push({ ...carCard, specifications: specifications });
+        // const carCard = await createExternalCarService({
+        //   currency: parseFiatAsset(weltCar.currency),
+        //   description: specs?.description || "",
+        //   isActive: true,
+        //   inStock: false,
+        //   importedPhotos: weltCar.media,
+        //   price: weltCar.price ? String(weltCar.price) : null,
+        //   externalId: externalId,
+        //   carModel: model?.value ?? weltCar.model,
+        //   carBrand: specification?.value ?? weltCar.specification,
+        //   carYear: year?.value ?? String(weltCar.year),
+        //   carVin: vin?.value ?? String(weltCar.vin),
+        // });
+        //
+        // let specifications: Prisma.SpecificationGetPayload<any>[] = [];
+        // if (specs?.data) {
+        //   specifications = await createManySpecificationService(
+        //     specs.data.map((spec) => ({ ...spec, carCardId: carCard.id })),
+        //   );
+        // }
+        // addedCarCards.push({ ...carCard, specifications: specifications });
       } catch (error) {
         await bot.api.sendMessage(
           process.env.SERVICE_CHAT || "",
