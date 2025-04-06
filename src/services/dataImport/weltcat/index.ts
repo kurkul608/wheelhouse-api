@@ -74,12 +74,8 @@ export const getAndSaveWeltCarData = async () => {
         externalIds.push(externalId);
 
         const extendCarCard = await getByExternalIdCarCardService(externalId);
-        if (weltCar.id === "NK-MG-0325-2678") {
-          console.log("NK-MG-0325-2678");
-          console.log(extendCarCard);
-        }
         if (extendCarCard) {
-          // server.log.info(`externalId exist: ${externalId}`);
+          server.log.info(`externalId exist: ${externalId}`);
           if (!extendCarCard.isActive) {
             await prisma.carCard.update({
               where: { id: extendCarCard.id },
@@ -108,28 +104,27 @@ export const getAndSaveWeltCarData = async () => {
         const year = specs?.data.find((spec) => spec.field === "year");
         const vin = specs?.data.find((spec) => spec.field === "vin");
 
-        console.log("IN CREATE id: ", weltCar.id);
-        // const carCard = await createExternalCarService({
-        //   currency: parseFiatAsset(weltCar.currency),
-        //   description: specs?.description || "",
-        //   isActive: true,
-        //   inStock: false,
-        //   importedPhotos: weltCar.media,
-        //   price: weltCar.price ? String(weltCar.price) : null,
-        //   externalId: externalId,
-        //   carModel: model?.value ?? weltCar.model,
-        //   carBrand: specification?.value ?? weltCar.specification,
-        //   carYear: year?.value ?? String(weltCar.year),
-        //   carVin: vin?.value ?? String(weltCar.vin),
-        // });
-        //
-        // let specifications: Prisma.SpecificationGetPayload<any>[] = [];
-        // if (specs?.data) {
-        //   specifications = await createManySpecificationService(
-        //     specs.data.map((spec) => ({ ...spec, carCardId: carCard.id })),
-        //   );
-        // }
-        // addedCarCards.push({ ...carCard, specifications: specifications });
+        const carCard = await createExternalCarService({
+          currency: parseFiatAsset(weltCar.currency),
+          description: specs?.description || "",
+          isActive: true,
+          inStock: false,
+          importedPhotos: weltCar.media,
+          price: weltCar.price ? String(weltCar.price) : null,
+          externalId: externalId,
+          carModel: model?.value ?? weltCar.model,
+          carBrand: specification?.value ?? weltCar.specification,
+          carYear: year?.value ?? String(weltCar.year),
+          carVin: vin?.value ?? String(weltCar.vin),
+        });
+
+        let specifications: Prisma.SpecificationGetPayload<any>[] = [];
+        if (specs?.data) {
+          specifications = await createManySpecificationService(
+            specs.data.map((spec) => ({ ...spec, carCardId: carCard.id })),
+          );
+        }
+        addedCarCards.push({ ...carCard, specifications: specifications });
       } catch (error) {
         await bot.api.sendMessage(
           process.env.SERVICE_CHAT || "",
