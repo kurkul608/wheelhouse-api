@@ -15,6 +15,7 @@ import { createExternalCarService } from "../../carCard/createExternal.carCard.s
 import { updateListCacheCarCardService } from "../../carCard/updateListCache.carCard.service";
 import { updateCarCardService } from "../../carCard/update.carCard.service";
 import { getAllExternalManagerCarService } from "../../manager/car/getAllExternalActive.manager.car.service";
+import prisma from "../../../prisma";
 
 export interface WeltCarData {
   id: string;
@@ -76,7 +77,13 @@ export const getAndSaveWeltCarData = async () => {
 
         if (extendCarCard && extendCarCard.specifications.length > 2) {
           server.log.info(`externalId exist: ${externalId}`);
-          await updateCarCardService(extendCarCard.id, { isActive: true });
+          if (!extendCarCard.isActive) {
+            await prisma.carCard.update({
+              where: { id: extendCarCard.id },
+              data: { isActive: true },
+            });
+          }
+
           continue;
         }
 
