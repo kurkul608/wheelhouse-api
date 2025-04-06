@@ -28,6 +28,7 @@ export const setDisableManyCarCardService = async (
         isActive: false,
       },
     });
+
     return carCards;
   } catch (error) {
     console.error(error);
