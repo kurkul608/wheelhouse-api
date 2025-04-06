@@ -6,6 +6,7 @@ import * as repl from "node:repl";
 import { getMessageTemplateListService } from "../../../services/admin/messageTemplate/getMessageTemplateList.service";
 import { getMessageTemplateService } from "../../../services/admin/messageTemplate/getMessageTemplate.service";
 import { sendMessageTemplateService } from "../../../services/admin/messageTemplate/sendMessageTemplate.service";
+import { updateMessageTemplateService } from "../../../services/admin/messageTemplate/updateMessageTemplate.service";
 
 export async function adminTemplateRoutes(fastify: FastifyInstance) {
   fastify.addHook("preHandler", authMiddleware);
@@ -63,6 +64,50 @@ export async function adminTemplateRoutes(fastify: FastifyInstance) {
           text: data.text,
           name: data.name,
         });
+
+        reply.status(201).send(messageTemplate);
+      } catch (error) {
+        fastify.log.error("Error creating messageTemplate code ", error);
+        reply
+          .status(500)
+          .send({ error: "Unable to create messageTemplate code" });
+      }
+    },
+  );
+  fastify.patch(
+    "/admin/messageTemplate/:messageTemplateId",
+    {
+      schema: {
+        params: {
+          type: "object",
+          properties: {
+            messageTemplateId: { type: "string" },
+          },
+          required: ["messageTemplateId"],
+        },
+        body: {
+          type: "object",
+          properties: {
+            text: { type: "string" },
+            name: { type: "string" },
+          },
+        },
+      },
+    },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      try {
+        const { messageTemplateId } = request.params as {
+          messageTemplateId: string;
+        };
+        const data = request.body as { text?: string; name?: string };
+
+        const messageTemplate = await updateMessageTemplateService(
+          messageTemplateId,
+          {
+            text: data.text,
+            name: data.name,
+          },
+        );
 
         reply.status(201).send(messageTemplate);
       } catch (error) {

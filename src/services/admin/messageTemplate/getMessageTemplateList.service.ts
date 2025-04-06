@@ -5,7 +5,11 @@ export const getMessageTemplateListService = async (): Promise<
   MessageTemplate[]
 > => {
   try {
-    const messageTemplateList = await prisma.messageTemplate.findMany();
+    const messageTemplateList = await prisma.messageTemplate.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
 
     return messageTemplateList;
   } catch (error) {
