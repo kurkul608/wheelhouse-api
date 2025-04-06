@@ -108,6 +108,7 @@ export const getAndSaveWeltCarData = async () => {
         const year = specs?.data.find((spec) => spec.field === "year");
         const vin = specs?.data.find((spec) => spec.field === "vin");
 
+        console.log("IN CREATE id: ", weltCar.id);
         // const carCard = await createExternalCarService({
         //   currency: parseFiatAsset(weltCar.currency),
         //   description: specs?.description || "",
