@@ -13,6 +13,7 @@ import { InlineKeyboard } from "grammy";
 import { getMiniAppLink } from "../../../utils/getMiniAppLink";
 import { createExternalCarService } from "../../carCard/createExternal.carCard.service";
 import { updateListCacheCarCardService } from "../../carCard/updateListCache.carCard.service";
+import { updateCarCardService } from "../../carCard/update.carCard.service";
 
 export interface WeltCarData {
   id: string;
@@ -55,88 +56,75 @@ export const getAndSaveWeltCarData = async () => {
       : data;
 
     server.log.info(`Data loaded. Total cars: ${weltCarData.length}`);
-
     await bot.api.sendMessage(
       process.env.SERVICE_CHAT || "",
       `Получено авто от партнеров ${weltCarData.length}`,
     );
+
     const externalIds: string[] = [];
     const addedCarCards: Prisma.CarCardGetPayload<{
       include: { specifications: true };
     }>[] = [];
-    for (let i = 0; i < weltCarData.length; i += BATCH_SIZE) {
-      const batch = weltCarData.slice(i, i + BATCH_SIZE);
 
-      server.log.info(`Processing batch ${Math.floor(i / BATCH_SIZE) + 1}`);
+    for (const weltCar of weltCarData) {
+      try {
+        const externalId = `${WELT_CAR_ID}${weltCar.id}`;
+        externalIds.push(externalId);
 
-      await Promise.all(
-        batch.map(async (weltCar) => {
-          try {
-            const externalId = `${WELT_CAR_ID}${weltCar.id}`;
-            externalIds.push(externalId);
-            const extendCarCard =
-              await getByExternalIdCarCardService(externalId);
-            if (extendCarCard && extendCarCard.specifications.length > 2) {
-              server.log.info(`externalId exist: ${externalId}`);
-              return;
-            }
+        const extendCarCard = await getByExternalIdCarCardService(externalId);
+        if (extendCarCard && extendCarCard.specifications.length > 2) {
+          server.log.info(`externalId exist: ${externalId}`);
+          await updateCarCardService(extendCarCard.id, { isActive: true });
+          continue;
+        }
 
-            let specs = null;
-            try {
-              specs = await generateCarOpenaiService(JSON.stringify(weltCar));
-              server.log.info(`externalId: ${externalId}`);
-              server.log.info(`specs: ${JSON.stringify(specs)}}`);
-            } catch (openAiError) {
-              server.log.warn(
-                `OpenAI error for car ${externalId}: ${(openAiError as { message: string }).message}`,
-              );
-            }
+        let specs = null;
+        try {
+          specs = await generateCarOpenaiService(JSON.stringify(weltCar));
+          server.log.info(`externalId: ${externalId}`);
+          server.log.info(`specs: ${JSON.stringify(specs)}`);
+        } catch (openAiError) {
+          server.log.warn(
+            `OpenAI error for car ${externalId}: ${(openAiError as { message: string }).message}`,
+          );
+        }
 
-            const model = specs?.data.find((spec) => spec.field === "model");
-            const specification = specs?.data.find(
-              (spec) => spec.field === "specification",
-            );
-            const year = specs?.data.find((spec) => spec.field === "year");
-            const vin = specs?.data.find((spec) => spec.field === "vin");
-
-            const carCard = await createExternalCarService({
-              currency: parseFiatAsset(weltCar.currency),
-              description: specs?.description || "",
-              isActive: true,
-              inStock: false,
-              importedPhotos: weltCar.media,
-              price: weltCar.price ? String(weltCar.price) : null,
-              externalId: externalId,
-              carModel: model?.value ?? weltCar.model,
-              carBrand: specification?.value ?? weltCar.specification,
-              carYear: year?.value ?? String(weltCar.year),
-              carVin: vin?.value ?? String(weltCar.vin),
-            });
-
-            let specifications: Prisma.SpecificationGetPayload<any>[] = [];
-            if (specs?.data) {
-              specifications = await createManySpecificationService(
-                specs.data.map((spec) => ({ ...spec, carCardId: carCard.id })),
-              );
-            }
-            addedCarCards.push({ ...carCard, specifications: specifications });
-          } catch (error) {
-            await bot.api.sendMessage(
-              process.env.SERVICE_CHAT || "",
-              `Error processing car ${weltCar.id}: ${(error as { message: string }).message}`,
-            );
-            server.log.error(
-              `Error processing car ${weltCar.id}: ${(error as { message: string }).message}`,
-            );
-          }
-        }),
-      );
-
-      if (i + BATCH_SIZE < weltCarData.length) {
-        server.log.info(
-          `Waiting ${DELAY_MS / 1000} seconds before next batch...`,
+        const model = specs?.data.find((spec) => spec.field === "model");
+        const specification = specs?.data.find(
+          (spec) => spec.field === "specification",
         );
-        await new Promise((resolve) => setTimeout(resolve, DELAY_MS));
+        const year = specs?.data.find((spec) => spec.field === "year");
+        const vin = specs?.data.find((spec) => spec.field === "vin");
+
+        const carCard = await createExternalCarService({
+          currency: parseFiatAsset(weltCar.currency),
+          description: specs?.description || "",
+          isActive: true,
+          inStock: false,
+          importedPhotos: weltCar.media,
+          price: weltCar.price ? String(weltCar.price) : null,
+          externalId: externalId,
+          carModel: model?.value ?? weltCar.model,
+          carBrand: specification?.value ?? weltCar.specification,
+          carYear: year?.value ?? String(weltCar.year),
+          carVin: vin?.value ?? String(weltCar.vin),
+        });
+
+        let specifications: Prisma.SpecificationGetPayload<any>[] = [];
+        if (specs?.data) {
+          specifications = await createManySpecificationService(
+            specs.data.map((spec) => ({ ...spec, carCardId: carCard.id })),
+          );
+        }
+        addedCarCards.push({ ...carCard, specifications: specifications });
+      } catch (error) {
+        await bot.api.sendMessage(
+          process.env.SERVICE_CHAT || "",
+          `Error processing car ${weltCar.id}: ${(error as { message: string }).message}`,
+        );
+        server.log.error(
+          `Error processing car ${weltCar.id}: ${(error as { message: string }).message}`,
+        );
       }
     }
 
@@ -146,9 +134,18 @@ export const getAndSaveWeltCarData = async () => {
     );
     server.log.info("Start disable car cards");
 
+    const filteredCarIds = addedCarCards
+      .filter(
+        (carCard) =>
+          carCard.isActive &&
+          carCard.externalId &&
+          !externalIds.includes(carCard.externalId),
+      )
+      .map((carCard) => carCard.id);
+
     const deactivatedCards = await setDisableManyCarCardService(
       WELT_CAR_ID,
-      externalIds,
+      filteredCarIds,
     );
 
     updateListCacheCarCardService().catch((err) => {
