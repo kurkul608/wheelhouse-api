@@ -5,27 +5,32 @@ export const setDisableManyCarCardService = async (
   externalIdPart: string,
   externalIds: string[],
 ): Promise<Prisma.CarCardGetPayload<any>[]> => {
-  const carCards = await prisma.carCard.findMany({
-    where: {
-      externalId: {
-        startsWith: externalIdPart,
-        notIn: externalIds,
+  try {
+    const carCards = await prisma.carCard.findMany({
+      where: {
+        externalId: {
+          startsWith: externalIdPart,
+          notIn: externalIds,
+        },
+        isActive: true,
       },
-      isActive: true,
-    },
-  });
+    });
 
-  await prisma.carCard.updateMany({
-    where: {
-      externalId: {
-        startsWith: externalIdPart,
-        notIn: externalIds,
+    await prisma.carCard.updateMany({
+      where: {
+        externalId: {
+          startsWith: externalIdPart,
+          notIn: externalIds,
+        },
+        isActive: true,
       },
-      isActive: true,
-    },
-    data: {
-      isActive: false,
-    },
-  });
-  return carCards;
+      data: {
+        isActive: false,
+      },
+    });
+    return carCards;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
 };

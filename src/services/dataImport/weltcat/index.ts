@@ -55,6 +55,11 @@ export const getAndSaveWeltCarData = async () => {
       : data;
 
     server.log.info(`Data loaded. Total cars: ${weltCarData.length}`);
+
+    await bot.api.sendMessage(
+      process.env.SERVICE_CHAT || "",
+      `Получено авто от партнеров ${weltCarData.length}`,
+    );
     const externalIds: string[] = [];
     const addedCarCards: Prisma.CarCardGetPayload<{
       include: { specifications: true };
@@ -116,6 +121,10 @@ export const getAndSaveWeltCarData = async () => {
             }
             addedCarCards.push({ ...carCard, specifications: specifications });
           } catch (error) {
+            await bot.api.sendMessage(
+              process.env.SERVICE_CHAT || "",
+              `Error processing car ${weltCar.id}: ${(error as { message: string }).message}`,
+            );
             server.log.error(
               `Error processing car ${weltCar.id}: ${(error as { message: string }).message}`,
             );
@@ -131,6 +140,10 @@ export const getAndSaveWeltCarData = async () => {
       }
     }
 
+    await bot.api.sendMessage(
+      process.env.SERVICE_CHAT || "",
+      `Начали леактивацию атомобилей. Количество авто под деактивацию - ${externalIds}`,
+    );
     server.log.info("Start disable car cards");
 
     const deactivatedCards = await setDisableManyCarCardService(

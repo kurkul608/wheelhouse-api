@@ -142,8 +142,6 @@ export const getListCarCardService = async ({
     page: currentPage,
     hasMore: count > currentPage * limit,
   };
-  console.log("carCards.length: ", carCards.length);
-  console.log("whereConditions: ", JSON.stringify(whereConditions));
 
   await redisClient.set(cacheKey, JSON.stringify(result), "EX", CACHE_TTL);
 
