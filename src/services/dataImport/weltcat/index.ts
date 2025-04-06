@@ -14,6 +14,7 @@ import { getMiniAppLink } from "../../../utils/getMiniAppLink";
 import { createExternalCarService } from "../../carCard/createExternal.carCard.service";
 import { updateListCacheCarCardService } from "../../carCard/updateListCache.carCard.service";
 import { updateCarCardService } from "../../carCard/update.carCard.service";
+import { getAllExternalManagerCarService } from "../../manager/car/getAllExternalActive.manager.car.service";
 
 export interface WeltCarData {
   id: string;
@@ -72,6 +73,7 @@ export const getAndSaveWeltCarData = async () => {
         externalIds.push(externalId);
 
         const extendCarCard = await getByExternalIdCarCardService(externalId);
+
         if (extendCarCard && extendCarCard.specifications.length > 2) {
           server.log.info(`externalId exist: ${externalId}`);
           await updateCarCardService(extendCarCard.id, { isActive: true });
@@ -134,7 +136,9 @@ export const getAndSaveWeltCarData = async () => {
     );
     server.log.info("Start disable car cards");
 
-    const filteredCarIds = addedCarCards
+    const allActiveExternalCars = await getAllExternalManagerCarService();
+
+    const filteredCarIds = allActiveExternalCars
       .filter(
         (carCard) =>
           carCard.isActive &&
