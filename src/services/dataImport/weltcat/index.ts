@@ -78,7 +78,7 @@ export const getAndSaveWeltCarData = async () => {
           console.log("NK-MG-0325-2678");
           console.log(extendCarCard);
         }
-        if (extendCarCard && extendCarCard.specifications.length > 2) {
+        if (extendCarCard) {
           // server.log.info(`externalId exist: ${externalId}`);
           if (!extendCarCard.isActive) {
             await prisma.carCard.update({
