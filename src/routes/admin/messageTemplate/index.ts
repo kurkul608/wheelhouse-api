@@ -2,7 +2,6 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { authMiddleware } from "../../../middlewares/authMiddleware";
 import { adminMiddleware } from "../../../middlewares/adminMiddleware";
 import { createMessageTemplateService } from "../../../services/admin/messageTemplate/createMessageTemplate.service";
-import * as repl from "node:repl";
 import { getMessageTemplateListService } from "../../../services/admin/messageTemplate/getMessageTemplateList.service";
 import { getMessageTemplateService } from "../../../services/admin/messageTemplate/getMessageTemplate.service";
 import { sendMessageTemplateService } from "../../../services/admin/messageTemplate/sendMessageTemplate.service";

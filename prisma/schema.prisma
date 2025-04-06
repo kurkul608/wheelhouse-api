@@ -188,6 +188,7 @@ model MessageTemplate {
 
 model Message {
   id          String @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
   prismaWhere Json
 
   messageTemplateId String          @db.ObjectId
