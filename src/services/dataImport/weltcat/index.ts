@@ -74,7 +74,10 @@ export const getAndSaveWeltCarData = async () => {
         externalIds.push(externalId);
 
         const extendCarCard = await getByExternalIdCarCardService(externalId);
-
+        if (weltCar.id === "NK-MG-0325-2678") {
+          console.log("NK-MG-0325-2678");
+          console.log(extendCarCard);
+        }
         if (extendCarCard && extendCarCard.specifications.length > 2) {
           server.log.info(`externalId exist: ${externalId}`);
           if (!extendCarCard.isActive) {
@@ -152,9 +155,6 @@ export const getAndSaveWeltCarData = async () => {
           carCard.externalId && !externalIds.includes(carCard.externalId),
       )
       .map((carCard) => carCard.id);
-
-    console.log("externalIds: ", externalIds);
-    console.log("filteredCarIds: ", filteredCarIds);
 
     const deactivatedCards = await setDisableManyCarCardService(filteredCarIds);
 
