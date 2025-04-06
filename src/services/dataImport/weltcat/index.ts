@@ -34,7 +34,7 @@ export interface WeltCarData {
 }
 const BATCH_SIZE = 3;
 const DELAY_MS = 20_000;
-const WELT_CAR_ID = "weltcar-";
+export const WELT_CAR_ID = "weltcar-";
 
 export const WELT_CAR_DATA_PATH = "cars/list/json";
 
@@ -144,20 +144,19 @@ export const getAndSaveWeltCarData = async () => {
     server.log.info("Start disable car cards");
 
     const allActiveExternalCars = await getAllExternalManagerCarService();
+    console.log("allActiveExternalCars.len: ", allActiveExternalCars.length);
 
     const filteredCarIds = allActiveExternalCars
       .filter(
         (carCard) =>
-          carCard.isActive &&
-          carCard.externalId &&
-          !externalIds.includes(carCard.externalId),
+          carCard.externalId && !externalIds.includes(carCard.externalId),
       )
       .map((carCard) => carCard.id);
 
-    const deactivatedCards = await setDisableManyCarCardService(
-      WELT_CAR_ID,
-      filteredCarIds,
-    );
+    console.log("externalIds: ", externalIds);
+    console.log("filteredCarIds: ", filteredCarIds);
+
+    const deactivatedCards = await setDisableManyCarCardService(filteredCarIds);
 
     updateListCacheCarCardService().catch((err) => {
       console.error("Ошибка при обработке ключей:", err);

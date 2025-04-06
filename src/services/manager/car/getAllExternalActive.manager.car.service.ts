@@ -1,14 +1,14 @@
 import prisma from "../../../prisma";
+import { WELT_CAR_ID } from "../../dataImport/weltcat";
 
 export const getAllExternalManagerCarService = async () => {
   try {
     const cars = await prisma.carCard.findMany({
       where: {
-        isActive: true,
         externalId: {
-          // @ts-ignore
-          notIn: [null, ""],
+          contains: WELT_CAR_ID,
         },
+        isActive: true,
       },
     });
     return cars;

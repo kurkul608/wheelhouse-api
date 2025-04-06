@@ -28,6 +28,7 @@ import { getRefService } from "../services/ref/get.refService";
 import { updateUserService } from "../services/user/updateUser.service";
 import { sendEventToYandexMetrika } from "../services/sendMetrika/sendMetrika.service";
 import { clickRefService } from "../services/ref/click.refService";
+import { getAllExternalManagerCarService } from "../services/manager/car/getAllExternalActive.manager.car.service";
 
 dotenv.config();
 
@@ -380,6 +381,15 @@ bot.command("site", async (ctx) => {
   }
 });
 
+// bot.command("test", async (ctx) => {
+//   try {
+//     const data = await getAllExternalManagerCarService();
+//     console.log(data);
+//     await ctx.reply("done");
+//   } catch (err) {
+//     console.error(err);
+//   }
+// });
 bot.command("gpttest", async (ctx) => {
   try {
     const user = await getByTgIdUserService(ctx.from!.id);
