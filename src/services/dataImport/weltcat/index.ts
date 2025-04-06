@@ -139,7 +139,7 @@ export const getAndSaveWeltCarData = async () => {
 
     await bot.api.sendMessage(
       process.env.SERVICE_CHAT || "",
-      `Начали леактивацию атомобилей. Количество авто под деактивацию - ${externalIds}`,
+      `Начали леактивацию атомобилей. Количество авто под деактивацию - ${externalIds.length}`,
     );
     server.log.info("Start disable car cards");
 
