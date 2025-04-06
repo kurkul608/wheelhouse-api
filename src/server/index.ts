@@ -14,6 +14,7 @@ import { adminUsersRoutes } from "../routes/admin/users";
 import { managerPublicRoutes } from "../routes/manager/public";
 import { filtersRoutes } from "../routes/filters";
 import { adminRefRoutes } from "../routes/admin/ref";
+import { adminTemplateRoutes } from "../routes/admin/messageTemplate";
 
 export const server = fastify({ logger: true });
 
@@ -49,3 +50,4 @@ server.register(adminUsersRoutes);
 server.register(managerPublicRoutes);
 server.register(filtersRoutes);
 server.register(adminRefRoutes);
+server.register(adminTemplateRoutes);

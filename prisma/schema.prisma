@@ -171,6 +171,54 @@ model Ref {
   name      String?
   startDate DateTime?
   users     User[]
+  clicks    BigInt?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+}
+
+model MessageTemplate {
+  id   String @id @default(auto()) @map("_id") @db.ObjectId
+  name String
+  text String
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  Message   Message[]
+}
+
+model Message {
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  prismaWhere Json
+
+  messageTemplateId String          @db.ObjectId
+  MessageTemplate   MessageTemplate @relation(fields: [messageTemplateId], references: [id])
+
+  carCardsWhere Json
+
+  status MessageStatus
+  type   MessageType
+
+  startTime DateTime
+
+  periodType MessagePeriodType?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum MessageStatus {
+  ACTIVE
+  DISABLED
+}
+
+enum MessageType {
+  ONCE
+  PERIOD
+}
+
+enum MessagePeriodType {
+  EVERY_HOUR
+  EVERY_DAY
+  EVERY_WEEK
+  EVERY_MONTH
 }

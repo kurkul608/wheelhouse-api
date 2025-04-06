@@ -27,6 +27,7 @@ import { updateListCacheCarCardService } from "../services/carCard/updateListCac
 import { getRefService } from "../services/ref/get.refService";
 import { updateUserService } from "../services/user/updateUser.service";
 import { sendEventToYandexMetrika } from "../services/sendMetrika/sendMetrika.service";
+import { clickRefService } from "../services/ref/click.refService";
 
 dotenv.config();
 
@@ -61,6 +62,12 @@ bot.command("start", async (ctx) => {
 
     const clientId = parseQuery(queryString, "id");
     const refId = parseQuery(queryString, "refId");
+
+    if (refId) {
+      clickRefService(refId).catch((error) => {
+        console.error(error);
+      });
+    }
 
     if (!existUser) {
       if (refId) {

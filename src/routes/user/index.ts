@@ -5,6 +5,7 @@ import { getByTgIdUserService } from "../../services/user/getByTgId.user.service
 import { bot } from "../../bot";
 import { createUserService } from "../../services/user/create.user.service";
 import { UserRole } from "@prisma/client";
+import { clickRefService } from "../../services/ref/click.refService";
 
 export async function userRoutes(fastify: FastifyInstance) {
   fastify.addHook("preHandler", authMiddleware);
@@ -23,8 +24,14 @@ export async function userRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        console.log("in register");
         const { refId } = request.body as { refId?: string };
+
+        if (refId) {
+          clickRefService(refId).catch((error) => {
+            console.error(error);
+          });
+        }
+
         const userTgId = getIdByToken(request.headers.authorization || "");
         const existUser = await getByTgIdUserService(userTgId);
 
