@@ -104,14 +104,19 @@ model CarCard {
 }
 
 model File {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
   domain    String
   file_size Int
   key       String
   bucket    String
   weight    Int?
+
   CarCard   CarCard? @relation(fields: [carCardId], references: [id])
   carCardId String?  @db.ObjectId
+
+  messageTempplateIds String[]          @db.ObjectId
+  messageTempplates   MessageTemplate[] @relation(fields: [messageTempplateIds], references: [id])
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -149,13 +154,15 @@ model BucketCarCard {
 }
 
 model Wishlist {
-  id         String    @id @default(auto()) @map("_id") @db.ObjectId
-  userId     String    @unique @db.ObjectId
-  user       User      @relation(fields: [userId], references: [id])
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @unique @db.ObjectId
+  user   User   @relation(fields: [userId], references: [id])
+
   carCardIds String[]  @db.ObjectId
   carCards   CarCard[] @relation(fields: [carCardIds], references: [id])
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Video {
@@ -181,20 +188,25 @@ model MessageTemplate {
   name String
   text String
 
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  photos   File[]   @relation(fields: [photoIds], references: [id])
+  photoIds String[] @db.ObjectId
+
+  links String[]
+
   Message   Message[]
+  updatedAt DateTime  @updatedAt
+  createdAt DateTime  @default(now())
 }
 
 model Message {
-  id          String @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
-  prismaWhere Json
+  id         String         @id @default(auto()) @map("_id") @db.ObjectId
+  name       String
+  usersWhere WhereUsersEnum
 
   messageTemplateId String          @db.ObjectId
   MessageTemplate   MessageTemplate @relation(fields: [messageTemplateId], references: [id])
 
-  carCardsWhere Json
+  carCardsWhere Json?
 
   status MessageStatus
   type   MessageType
@@ -205,6 +217,15 @@ model Message {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+enum WhereUsersEnum {
+  ONCE_USE_BOT
+  N_AUTO_IN_WISHLIST
+  SPECIAL_AUTO_IN_WISHLIST
+  MANY_SPECIAL_AUTO_IN_WISHLIST
+  MANY_ORDERS
+  MANY_ORDER_ON_BRAND
 }
 
 enum MessageStatus {

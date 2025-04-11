@@ -20,6 +20,14 @@ export async function adminTemplateRoutes(fastify: FastifyInstance) {
           properties: {
             text: { type: "string" },
             userId: { type: "string" },
+            photoIds: {
+              type: "array",
+              items: { type: "string" },
+            },
+            links: {
+              type: "array",
+              items: { type: "string" },
+            },
           },
           required: ["text", "userId"],
         },
@@ -27,12 +35,19 @@ export async function adminTemplateRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        const { text, userId } = request.body as {
+        const { text, userId, photoIds, links } = request.body as {
           text: string;
           userId: string;
+          photoIds?: string[];
+          links?: string[];
         };
 
-        const result = await sendMessageTemplateService(text, userId);
+        const result = await sendMessageTemplateService({
+          userId,
+          links,
+          messageText: text,
+          photoIds,
+        });
 
         reply.status(200).send(result);
       } catch (error) {
@@ -50,6 +65,14 @@ export async function adminTemplateRoutes(fastify: FastifyInstance) {
           properties: {
             text: { type: "string" },
             name: { type: "string" },
+            photoIds: {
+              type: "array",
+              items: { type: "string" },
+            },
+            links: {
+              type: "array",
+              items: { type: "string" },
+            },
           },
           required: ["text", "name"],
         },
@@ -57,11 +80,18 @@ export async function adminTemplateRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        const data = request.body as { text: string; name: string };
+        const { name, text, photoIds, links } = request.body as {
+          text: string;
+          name: string;
+          photoIds?: string[];
+          links?: string[];
+        };
 
         const messageTemplate = await createMessageTemplateService({
-          text: data.text,
-          name: data.name,
+          text,
+          name,
+          photoIds: photoIds || [],
+          links: links || [],
         });
 
         reply.status(201).send(messageTemplate);
@@ -89,6 +119,14 @@ export async function adminTemplateRoutes(fastify: FastifyInstance) {
           properties: {
             text: { type: "string" },
             name: { type: "string" },
+            photoIds: {
+              type: "array",
+              items: { type: "string" },
+            },
+            links: {
+              type: "array",
+              items: { type: "string" },
+            },
           },
         },
       },
@@ -98,13 +136,20 @@ export async function adminTemplateRoutes(fastify: FastifyInstance) {
         const { messageTemplateId } = request.params as {
           messageTemplateId: string;
         };
-        const data = request.body as { text?: string; name?: string };
+        const { text, name, photoIds, links } = request.body as {
+          text?: string;
+          name?: string;
+          photoIds?: string[];
+          links?: string[];
+        };
 
         const messageTemplate = await updateMessageTemplateService(
           messageTemplateId,
           {
-            text: data.text,
-            name: data.name,
+            text,
+            name,
+            photoIds,
+            links,
           },
         );
 
