@@ -7,6 +7,7 @@ export const getMessageTemplateService = async (
   try {
     const messageTemplate = await prisma.messageTemplate.findUnique({
       where: { id: messageTemplateId },
+      include: { photos: true },
     });
     return messageTemplate;
   } catch (error) {

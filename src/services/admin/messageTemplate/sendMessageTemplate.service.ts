@@ -38,6 +38,7 @@ export const sendMessageTemplateService = async ({
         where: {
           id: { in: photoIds },
         },
+        orderBy: { weight: "asc" },
       });
 
       if (photos.length !== photoIds.length) {
