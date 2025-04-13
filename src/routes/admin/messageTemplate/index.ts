@@ -26,7 +26,14 @@ export async function adminTemplateRoutes(fastify: FastifyInstance) {
             },
             links: {
               type: "array",
-              items: { type: "string" },
+              items: {
+                type: "object",
+                properties: {
+                  label: { type: "string" },
+                  value: { type: "string" },
+                },
+                required: ["label", "value"],
+              },
             },
           },
           required: ["text", "userId"],
@@ -39,7 +46,7 @@ export async function adminTemplateRoutes(fastify: FastifyInstance) {
           text: string;
           userId: string;
           photoIds?: string[];
-          links?: string[];
+          links?: { label: string; value: string }[];
         };
 
         const result = await sendMessageTemplateService({
@@ -71,7 +78,14 @@ export async function adminTemplateRoutes(fastify: FastifyInstance) {
             },
             links: {
               type: "array",
-              items: { type: "string" },
+              items: {
+                type: "object",
+                properties: {
+                  label: { type: "string" },
+                  value: { type: "string" },
+                },
+                required: ["label", "value"],
+              },
             },
           },
           required: ["text", "name"],
@@ -84,7 +98,7 @@ export async function adminTemplateRoutes(fastify: FastifyInstance) {
           text: string;
           name: string;
           photoIds?: string[];
-          links?: string[];
+          links?: { label: string; value: string }[];
         };
 
         const messageTemplate = await createMessageTemplateService({
@@ -125,7 +139,14 @@ export async function adminTemplateRoutes(fastify: FastifyInstance) {
             },
             links: {
               type: "array",
-              items: { type: "string" },
+              items: {
+                type: "object",
+                properties: {
+                  label: { type: "string" },
+                  value: { type: "string" },
+                },
+                required: ["label", "value"],
+              },
             },
           },
         },
@@ -140,7 +161,7 @@ export async function adminTemplateRoutes(fastify: FastifyInstance) {
           text?: string;
           name?: string;
           photoIds?: string[];
-          links?: string[];
+          links?: { label: string; value: string }[];
         };
 
         const messageTemplate = await updateMessageTemplateService(

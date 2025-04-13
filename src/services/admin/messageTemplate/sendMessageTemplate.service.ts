@@ -4,7 +4,6 @@ import prisma from "../../../prisma";
 import { InlineKeyboard, InputFile, InputMediaBuilder } from "grammy";
 import { File } from "@prisma/client";
 import { getFileLink } from "../../../utils/getFileLink";
-import type { InlineKeyboardButton } from "grammy/types";
 
 const convertToTelegramHTML = (html: string) => {
   html = html.replace(/<\/p>/g, "\n\n");
@@ -23,7 +22,7 @@ export const sendMessageTemplateService = async ({
   messageText: string;
   userId: string;
   photoIds?: string[];
-  links?: string[];
+  links?: { label: string; value: string }[];
 }): Promise<{ message: string }> => {
   try {
     const user = await getUserService(userId);
@@ -50,7 +49,7 @@ export const sendMessageTemplateService = async ({
 
     if (links) {
       links.forEach((link) => {
-        linkPairs.push([link, link]);
+        linkPairs.push([link.label, link.value]);
       });
     }
 

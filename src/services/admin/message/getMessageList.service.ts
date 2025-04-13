@@ -7,6 +7,7 @@ export const getMessageListService = async (
   try {
     const messages = await prisma.message.findMany({
       where,
+      orderBy: { createdAt: "desc" },
     });
 
     return messages;

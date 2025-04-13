@@ -12,6 +12,8 @@ import {
 import { updateMessageService } from "../../../services/admin/message/updateMessage.service";
 import { getMessageListService } from "../../../services/admin/message/getMessageList.service";
 import { getMessageService } from "../../../services/admin/message/getMessage.service";
+import { sentMessageService } from "../../../services/admin/message/sentMessage.service";
+import { bot } from "../../../bot";
 
 const createMessageSchema = {
   body: {
@@ -22,10 +24,10 @@ const createMessageSchema = {
         enum: [
           "ONCE_USE_BOT",
           "N_AUTO_IN_WISHLIST",
-          "SPECIAL_AUTO_IN_WISHLIST",
           "MANY_SPECIAL_AUTO_IN_WISHLIST",
           "MANY_ORDERS",
           "MANY_ORDER_ON_BRAND",
+          "ADMIN_ONLY",
         ],
       },
       messageTemplateId: {
@@ -61,16 +63,9 @@ const createMessageSchema = {
         type: "string",
         enum: ["EVERY_HOUR", "EVERY_DAY", "EVERY_WEEK", "EVERY_MONTH"],
       },
+      startNow: { type: "boolean" },
     },
-    required: [
-      "usersWhere",
-      "messageTemplateId",
-      // "carCardsWhere",
-      "name",
-      "status",
-      "type",
-      "startTime",
-    ],
+    required: ["usersWhere", "messageTemplateId", "name", "status", "type"],
   },
 };
 
@@ -79,7 +74,7 @@ const updateMessageParamsSchema = {
   properties: {
     messageId: {
       type: "string",
-      pattern: "^[0-9a-fA-F]{24}$", // проверка для ObjectId
+      pattern: "^[0-9a-fA-F]{24}$",
     },
   },
   required: ["messageId"],
@@ -88,7 +83,17 @@ const updateMessageParamsSchema = {
 const updateMessageBodySchema = {
   type: "object",
   properties: {
-    usersWhere: { type: "string" },
+    usersWhere: {
+      type: "string",
+      enum: [
+        "ONCE_USE_BOT",
+        "N_AUTO_IN_WISHLIST",
+        "MANY_SPECIAL_AUTO_IN_WISHLIST",
+        "MANY_ORDERS",
+        "MANY_ORDER_ON_BRAND",
+        "ADMIN_ONLY",
+      ],
+    },
     messageTemplateId: {
       type: "string",
       pattern: "^[0-9a-fA-F]{24}$",
@@ -122,6 +127,7 @@ const updateMessageBodySchema = {
       type: "string",
       enum: ["EVERY_HOUR", "EVERY_DAY", "EVERY_WEEK", "EVERY_MONTH"],
     },
+    startNow: { type: "boolean" },
   },
   additionalProperties: false,
 };
@@ -148,6 +154,7 @@ export async function adminMessageRoutes(fastify: FastifyInstance) {
           brandsAutoInWishlist,
           countOrders,
           brandsAutoInOrders,
+          startNow,
         } = request.body as {
           usersWhere: WhereUsersEnum;
           countAutoInWishlist?: number;
@@ -158,9 +165,10 @@ export async function adminMessageRoutes(fastify: FastifyInstance) {
           carCardsWhere: any;
           status: MessageStatus;
           type: MessageType;
-          startTime: string;
+          startTime?: string;
           name: string;
           periodType?: MessagePeriodType;
+          startNow?: boolean;
         };
 
         if (
@@ -186,8 +194,7 @@ export async function adminMessageRoutes(fastify: FastifyInstance) {
         }
 
         if (
-          (usersWhere === WhereUsersEnum.MANY_ORDERS ||
-            usersWhere === WhereUsersEnum.MANY_ORDER_ON_BRAND) &&
+          usersWhere === WhereUsersEnum.MANY_ORDERS &&
           (countOrders === undefined || countOrders === null || countOrders < 0)
         ) {
           return reply.status(400).send({
@@ -215,9 +222,42 @@ export async function adminMessageRoutes(fastify: FastifyInstance) {
           startTime,
           MessageTemplate: { connect: { id: messageTemplateId } },
           status,
+          countAutoInWishlist,
+          brandsAutoInWishlist,
+          brandsAutoInOrders,
+          countOrders,
         };
 
         const message = await createMessageService(dto);
+
+        if (startNow) {
+          sentMessageService(message.id)
+            .then(async () => {
+              await updateMessageService(message.id, {
+                isSend: true,
+                status: MessageStatus.DISABLED,
+              });
+              try {
+                await bot.api.sendMessage(
+                  process.env.SERVICE_CHAT || "",
+                  `Рассылка ${message.name} завершилась успешно`,
+                );
+              } catch (error) {
+                fastify.log.error(error);
+              }
+            })
+            .catch(async (error) => {
+              fastify.log.error(error);
+              try {
+                await bot.api.sendMessage(
+                  process.env.SERVICE_CHAT || "",
+                  `Во время рассылки произошла ошибка: ${error.message}`,
+                );
+              } catch (error) {
+                fastify.log.error(error);
+              }
+            });
+        }
 
         reply.status(201).send(message);
       } catch (error) {
@@ -251,6 +291,7 @@ export async function adminMessageRoutes(fastify: FastifyInstance) {
           countAutoInWishlist,
           brandsAutoInOrders,
           countOrders,
+          startNow,
         } = request.body as {
           usersWhere?: WhereUsersEnum;
           brandsAutoInWishlist?: string[];
@@ -264,6 +305,7 @@ export async function adminMessageRoutes(fastify: FastifyInstance) {
           periodType?: MessagePeriodType;
           countAutoInWishlist?: number;
           countOrders?: number;
+          startNow?: boolean;
         };
 
         if (
@@ -318,9 +360,42 @@ export async function adminMessageRoutes(fastify: FastifyInstance) {
           status,
           name,
           ...(messageTemplateId ? { messageTemplateId } : {}),
+          countAutoInWishlist,
+          brandsAutoInWishlist,
+          brandsAutoInOrders,
+          countOrders,
         };
 
         const message = await updateMessageService(messageId, dto);
+
+        if (startNow) {
+          sentMessageService(message.id)
+            .then(async () => {
+              await updateMessageService(message.id, {
+                isSend: true,
+                status: MessageStatus.DISABLED,
+              });
+              try {
+                await bot.api.sendMessage(
+                  process.env.SERVICE_CHAT || "",
+                  `Рассылка ${message.name} завершилась успешно`,
+                );
+              } catch (error) {
+                fastify.log.error(error);
+              }
+            })
+            .catch(async (error) => {
+              fastify.log.error(error);
+              try {
+                await bot.api.sendMessage(
+                  process.env.SERVICE_CHAT || "",
+                  `Во время рассылки произошла ошибка: ${error.message}`,
+                );
+              } catch (error) {
+                fastify.log.error(error);
+              }
+            });
+        }
 
         reply.status(200).send(message);
       } catch (error) {

@@ -191,7 +191,7 @@ model MessageTemplate {
   photos   File[]   @relation(fields: [photoIds], references: [id])
   photoIds String[] @db.ObjectId
 
-  links String[]
+  links Json[]
 
   Message   Message[]
   updatedAt DateTime  @updatedAt
@@ -203,6 +203,11 @@ model Message {
   name       String
   usersWhere WhereUsersEnum
 
+  countAutoInWishlist  Int?
+  brandsAutoInWishlist String[]
+  brandsAutoInOrders   String[]
+  countOrders          Int?
+
   messageTemplateId String          @db.ObjectId
   MessageTemplate   MessageTemplate @relation(fields: [messageTemplateId], references: [id])
 
@@ -211,7 +216,9 @@ model Message {
   status MessageStatus
   type   MessageType
 
-  startTime DateTime
+  startTime DateTime?
+
+  isSend Boolean?
 
   periodType MessagePeriodType?
 
@@ -222,10 +229,10 @@ model Message {
 enum WhereUsersEnum {
   ONCE_USE_BOT
   N_AUTO_IN_WISHLIST
-  SPECIAL_AUTO_IN_WISHLIST
   MANY_SPECIAL_AUTO_IN_WISHLIST
   MANY_ORDERS
   MANY_ORDER_ON_BRAND
+  ADMIN_ONLY
 }
 
 enum MessageStatus {
