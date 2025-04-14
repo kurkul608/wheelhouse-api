@@ -1,5 +1,5 @@
 import { generateCarCardKey } from "../../utils/redisKeys/generateCarCardKey";
-import { redisClient } from "../../redisClient/idnex";
+import { redisClient } from "../../redisClient";
 import { getCarCardService } from "./get.carCard.service";
 import { bot } from "../../bot";
 

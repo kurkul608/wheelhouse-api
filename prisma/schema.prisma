@@ -218,7 +218,7 @@ model Message {
 
   startTime DateTime?
 
-  isSend Boolean?
+  isSend Boolean @default(false)
 
   periodType MessagePeriodType?
 

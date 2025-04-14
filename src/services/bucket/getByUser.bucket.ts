@@ -1,6 +1,6 @@
 import prisma from "../../prisma";
 import { Prisma } from "@prisma/client";
-import { redisClient } from "../../redisClient/idnex";
+import { redisClient } from "../../redisClient";
 
 export const getByUserBucket = async (
   userId: string,

@@ -1,5 +1,5 @@
 import { generateCarBrandsFiltersKey } from "../../utils/redisKeys/generateCarBrandsFiltersKey";
-import { ONE_WEEK_CACHE_TTL, redisClient } from "../../redisClient/idnex";
+import { ONE_WEEK_CACHE_TTL, redisClient } from "../../redisClient";
 
 type FilterModelOption<T> = {
   value: T;

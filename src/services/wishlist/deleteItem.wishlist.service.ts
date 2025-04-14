@@ -1,5 +1,4 @@
 import prisma from "../../prisma";
-import { ONE_MONTH_CACHE_TTL, redisClient } from "../../redisClient/idnex";
 import { getByUserWishlist } from "./getByUser.wishlist";
 
 export async function deleteItemFromWishlist(

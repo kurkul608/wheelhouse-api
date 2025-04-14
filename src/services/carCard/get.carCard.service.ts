@@ -1,6 +1,6 @@
 import prisma from "../../prisma";
 import { Prisma } from "@prisma/client";
-import { CACHE_TTL, redisClient } from "../../redisClient/idnex";
+import { CACHE_TTL, redisClient } from "../../redisClient";
 import { generateCarCardKey } from "../../utils/redisKeys/generateCarCardKey";
 
 export const getCarCardService = async (

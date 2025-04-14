@@ -3,6 +3,10 @@ import { bot } from "./bot";
 import { getAndSaveWeltCarData } from "./services/dataImport/weltcat";
 import { scheduleJob } from "node-schedule";
 import { server } from "./server";
+import { messageQueue } from "./bull/messageQueue";
+import { sentMessageService } from "./services/admin/message/sentMessage.service";
+import { updateMessageService } from "./services/admin/message/updateMessage.service";
+import { scheduleMessages } from "./services/schedule/scheduleMessages";
 
 dotenv.config();
 
@@ -11,9 +15,30 @@ bot.start().then(() => {
 });
 
 scheduleJob("0 */12 * * *", async () => {
-  // scheduleJob("0 */1 * * *", async () => {
-  // scheduleJob("*/1 * * * *", async () => {
   await getAndSaveWeltCarData();
+});
+
+messageQueue.process(async (job) => {
+  const messageId: string = job.data.id;
+  try {
+    // Вызываем сервис отправки сообщения
+    await sentMessageService(messageId);
+    // Обновляем запись, чтобы отметить, что сообщение отправлено
+    await updateMessageService(messageId, { isSend: true });
+    // await prisma.message.update({
+    //   where: { id: messageId },
+    //   data: { isSend: true },
+    // });
+    console.log(`Сообщение ${messageId} успешно отправлено.`);
+  } catch (error) {
+    console.error(`Ошибка при отправке сообщения ${messageId}:`, error);
+    throw error;
+  }
+});
+
+scheduleJob("* * * * *", async () => {
+  console.log(`Проверка сообщений в ${new Date().toLocaleString()}`);
+  await scheduleMessages();
 });
 
 server.listen(

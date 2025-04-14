@@ -1,6 +1,6 @@
 import prisma from "../../prisma";
 import { Prisma } from "@prisma/client";
-import { ONE_MONTH_CACHE_TTL, redisClient } from "../../redisClient/idnex";
+import { ONE_MONTH_CACHE_TTL, redisClient } from "../../redisClient";
 import { generateWishlistKey } from "../../utils/redisKeys/generateWishlistKey";
 
 export async function createWishlistService(

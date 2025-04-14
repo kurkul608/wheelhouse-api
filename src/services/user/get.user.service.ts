@@ -1,7 +1,7 @@
 import prisma from "../../prisma";
 import { Prisma } from "@prisma/client";
 import { generateUserKey } from "../../utils/redisKeys/generateUserKey";
-import { redisClient } from "../../redisClient/idnex";
+import { redisClient } from "../../redisClient";
 
 export const getUserService = async (
   userId: string,

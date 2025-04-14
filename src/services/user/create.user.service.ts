@@ -2,7 +2,7 @@ import { Prisma } from "@prisma/client";
 import prisma from "../../prisma";
 import { createBucket } from "../bucket/create.bucket.service";
 import { createWishlistService } from "../wishlist/create.wishlist.service";
-import { ONE_MONTH_CACHE_TTL, redisClient } from "../../redisClient/idnex";
+import { ONE_MONTH_CACHE_TTL, redisClient } from "../../redisClient";
 import { getRefService } from "../ref/get.refService";
 
 export const createUserService = async (

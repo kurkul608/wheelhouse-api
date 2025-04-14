@@ -1,7 +1,7 @@
 import Bottleneck from "bottleneck";
 import { parseCarCardListKey } from "../../utils/redisKeys/parseCarCardListKey";
 import { CAR_CARD_LIST_PREFIX } from "../../utils/redisKeys/generateCarCardListKey";
-import { redisClient } from "../../redisClient/idnex";
+import { redisClient } from "../../redisClient";
 import { getListCarCardService } from "./getList.carCard.service";
 import { bot } from "../../bot";
 

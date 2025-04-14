@@ -1,6 +1,6 @@
 import { Prisma, UserRole } from "@prisma/client";
 import prisma from "../../prisma";
-import { ONE_MONTH_CACHE_TTL, redisClient } from "../../redisClient/idnex";
+import { ONE_MONTH_CACHE_TTL, redisClient } from "../../redisClient";
 
 export const updateRoleUserService = async (
   userId: string,

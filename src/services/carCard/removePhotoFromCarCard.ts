@@ -1,5 +1,5 @@
 import prisma from "../../prisma";
-import { CACHE_TTL, redisClient } from "../../redisClient/idnex";
+import { CACHE_TTL, redisClient } from "../../redisClient";
 import { updateListCacheCarCardService } from "./updateListCache.carCard.service";
 import { generateCarCardKey } from "../../utils/redisKeys/generateCarCardKey";
 import { getCarCardService } from "./get.carCard.service";

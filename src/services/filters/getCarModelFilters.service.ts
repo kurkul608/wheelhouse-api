@@ -5,7 +5,7 @@ import {
 import prisma from "../../prisma";
 import _ from "lodash";
 import { generateCarModelsFiltersKey } from "../../utils/redisKeys/generateCarModelsFiltersKey";
-import { ONE_WEEK_CACHE_TTL, redisClient } from "../../redisClient/idnex";
+import { ONE_WEEK_CACHE_TTL, redisClient } from "../../redisClient";
 
 function uniqueCaseInsensitive(arr: string[]): string[] {
   return _.uniqBy(arr, (str) => str.toLowerCase());

@@ -14,6 +14,7 @@ import { getMessageListService } from "../../../services/admin/message/getMessag
 import { getMessageService } from "../../../services/admin/message/getMessage.service";
 import { sentMessageService } from "../../../services/admin/message/sentMessage.service";
 import { bot } from "../../../bot";
+import { DateTime } from "luxon";
 
 const createMessageSchema = {
   body: {
@@ -213,13 +214,25 @@ export async function adminMessageRoutes(fastify: FastifyInstance) {
           });
         }
 
+        if (startTime) {
+          console.log("startTime: ", startTime);
+          console.log(
+            "upgraded time: ",
+            DateTime.fromISO(startTime).toUTC().toJSDate(),
+          );
+        }
+
         const dto: Prisma.MessageCreateInput = {
           name,
           type,
           periodType,
           carCardsWhere,
           usersWhere,
-          startTime,
+          ...(startTime
+            ? {
+                startTime: DateTime.fromISO(startTime).toUTC().toJSDate(),
+              }
+            : {}),
           MessageTemplate: { connect: { id: messageTemplateId } },
           status,
           countAutoInWishlist,
@@ -356,7 +369,11 @@ export async function adminMessageRoutes(fastify: FastifyInstance) {
           periodType,
           carCardsWhere,
           usersWhere,
-          startTime,
+          ...(startTime
+            ? {
+                startTime: DateTime.fromISO(startTime).toUTC().toJSDate(),
+              }
+            : {}),
           status,
           name,
           ...(messageTemplateId ? { messageTemplateId } : {}),

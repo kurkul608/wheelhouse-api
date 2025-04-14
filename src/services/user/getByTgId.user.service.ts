@@ -1,11 +1,7 @@
 import { Prisma } from "@prisma/client";
 import prisma from "../../prisma";
 import { createBucket } from "../bucket/create.bucket.service";
-import {
-  CACHE_TTL,
-  ONE_MONTH_CACHE_TTL,
-  redisClient,
-} from "../../redisClient/idnex";
+import { CACHE_TTL, ONE_MONTH_CACHE_TTL, redisClient } from "../../redisClient";
 
 export const getByTgIdUserService = async (
   userTgId: number,
