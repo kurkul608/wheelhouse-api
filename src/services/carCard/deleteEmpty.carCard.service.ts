@@ -1,7 +1,7 @@
-import prisma from "../../prisma";
+import { prismaMongoClient } from "../../prisma";
 
 export const deleteEmptyCarCardService = async () => {
-  const carCards = await prisma.carCard.findMany({
+  const carCards = await prismaMongoClient.carCard.findMany({
     where: {
       externalId: { equals: null },
     },

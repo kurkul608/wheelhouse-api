@@ -1,5 +1,5 @@
 import { MessageTemplate, Prisma } from "@prisma/client";
-import prisma from "../../../prisma";
+import { prismaMongoClient } from "../../../prisma";
 
 export const createMessageTemplateService = async ({
   photoIds,
@@ -9,7 +9,7 @@ export const createMessageTemplateService = async ({
 }): Promise<MessageTemplate> => {
   try {
     if (photoIds && photoIds.length > 0) {
-      const photos = await prisma.file.findMany({
+      const photos = await prismaMongoClient.file.findMany({
         where: {
           id: { in: photoIds },
         },
@@ -20,7 +20,7 @@ export const createMessageTemplateService = async ({
       }
     }
 
-    const messageTemplate = await prisma.messageTemplate.create({
+    const messageTemplate = await prismaMongoClient.messageTemplate.create({
       data: {
         ...dto,
         ...(photoIds

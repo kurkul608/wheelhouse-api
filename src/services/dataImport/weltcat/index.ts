@@ -5,7 +5,6 @@ import { setDisableManyCarCardService } from "../../carCard/setDisableMany.carCa
 import { parseFiatAsset } from "../../../utils/parseFiatAsset";
 import { Agent } from "node:https";
 import { generateCarOpenaiService } from "../../openai/generateCar.openai.service";
-import { getAllByExternalIdCarCardService } from "../../carCard/getAllByExternalId.carCard.service";
 import { bot } from "../../../bot";
 import { Prisma } from "@prisma/client";
 import { chunkArray } from "../../../utils/chunkArray";
@@ -13,9 +12,8 @@ import { InlineKeyboard } from "grammy";
 import { getMiniAppLink } from "../../../utils/getMiniAppLink";
 import { createExternalCarService } from "../../carCard/createExternal.carCard.service";
 import { updateListCacheCarCardService } from "../../carCard/updateListCache.carCard.service";
-import { updateCarCardService } from "../../carCard/update.carCard.service";
 import { getAllExternalManagerCarService } from "../../manager/car/getAllExternalActive.manager.car.service";
-import prisma from "../../../prisma";
+import { prismaMongoClient } from "../../../prisma";
 
 export interface WeltCarData {
   id: string;
@@ -77,7 +75,7 @@ export const getAndSaveWeltCarData = async () => {
         if (extendCarCard) {
           server.log.info(`externalId exist: ${externalId}`);
           if (!extendCarCard.isActive) {
-            await prisma.carCard.update({
+            await prismaMongoClient.carCard.update({
               where: { id: extendCarCard.id },
               data: { isActive: true },
             });
@@ -143,7 +141,6 @@ export const getAndSaveWeltCarData = async () => {
     server.log.info("Start disable car cards");
 
     const allActiveExternalCars = await getAllExternalManagerCarService();
-    console.log("allActiveExternalCars.len: ", allActiveExternalCars.length);
 
     const filteredCarIds = allActiveExternalCars
       .filter(

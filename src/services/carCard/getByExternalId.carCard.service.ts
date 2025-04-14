@@ -1,4 +1,4 @@
-import prisma from "../../prisma";
+import { prismaMongoClient } from "../../prisma";
 import { Prisma } from "@prisma/client";
 
 export const getByExternalIdCarCardService = async (
@@ -6,7 +6,7 @@ export const getByExternalIdCarCardService = async (
 ): Promise<Prisma.CarCardGetPayload<{
   include: { specifications: true };
 }> | null> => {
-  const carCard = await prisma.carCard.findFirst({
+  const carCard = await prismaMongoClient.carCard.findFirst({
     where: { externalId },
     include: { specifications: true },
   });

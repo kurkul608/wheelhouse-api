@@ -1,8 +1,8 @@
-import prisma from "../../../prisma";
+import { prismaMongoClient } from "../../../prisma";
 
 export const getMessageService = async (messageId: string) => {
   try {
-    const message = await prisma.message.findUnique({
+    const message = await prismaMongoClient.message.findUnique({
       where: { id: messageId },
     });
 

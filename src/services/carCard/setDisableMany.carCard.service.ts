@@ -1,11 +1,11 @@
 import { Prisma } from "@prisma/client";
-import prisma from "../../prisma";
+import { prismaMongoClient } from "../../prisma";
 
 export const setDisableManyCarCardService = async (
   externalIds: string[],
 ): Promise<Prisma.CarCardGetPayload<any>[]> => {
   try {
-    await prisma.carCard.updateMany({
+    await prismaMongoClient.carCard.updateMany({
       where: {
         externalId: {
           in: externalIds,
@@ -17,7 +17,7 @@ export const setDisableManyCarCardService = async (
       },
     });
 
-    const carCards = await prisma.carCard.findMany({
+    const carCards = await prismaMongoClient.carCard.findMany({
       where: { externalId: { in: externalIds } },
     });
 

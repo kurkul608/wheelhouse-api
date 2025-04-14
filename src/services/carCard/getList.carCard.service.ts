@@ -1,4 +1,4 @@
-import prisma from "../../prisma";
+import { prismaMongoClient } from "../../prisma";
 import { CACHE_TTL, redisClient } from "../../redisClient";
 import { generateCarCardListKey } from "../../utils/redisKeys/generateCarCardListKey";
 import { Prisma } from "@prisma/client";
@@ -105,7 +105,7 @@ export const getListCarCardService = async ({
     whereConditions.AND = andConditions;
   }
 
-  const carCards = await prisma.carCard.findMany({
+  const carCards = await prismaMongoClient.carCard.findMany({
     skip: offset,
     take: limit,
     include: {
@@ -125,7 +125,7 @@ export const getListCarCardService = async ({
       : {}),
   });
 
-  const count = await prisma.carCard.count({
+  const count = await prismaMongoClient.carCard.count({
     where: whereConditions,
     ...(sortOrder && sortBy
       ? {

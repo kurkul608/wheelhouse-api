@@ -1,11 +1,11 @@
 import { Prisma } from "@prisma/client";
-import prisma from "../../prisma";
+import { prismaMongoClient } from "../../prisma";
 
 export const createOrder = async (
   carId: string,
   userId: string,
 ): Promise<Prisma.OrderGetPayload<any>> => {
-  const order = await prisma.order.create({
+  const order = await prismaMongoClient.order.create({
     data: { userId, carCardIds: [carId] },
   });
 

@@ -1,11 +1,11 @@
-import prisma from "../../../prisma";
+import { prismaMongoClient } from "../../../prisma";
 import { Prisma } from "@prisma/client";
 
 export const getMessageListService = async (
   where?: Prisma.MessageWhereInput,
 ) => {
   try {
-    const messages = await prisma.message.findMany({
+    const messages = await prismaMongoClient.message.findMany({
       where,
       orderBy: { createdAt: "desc" },
     });

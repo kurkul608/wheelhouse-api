@@ -1,8 +1,8 @@
-import prisma from "../../prisma";
+import { prismaMongoClient } from "../../prisma";
 
 export const updateCarCardBrands = async () => {
   try {
-    const carCards = await prisma.carCard.findMany({
+    const carCards = await prismaMongoClient.carCard.findMany({
       include: { specifications: true },
     });
 
@@ -14,7 +14,7 @@ export const updateCarCardBrands = async () => {
         (spec) => spec.field === "specification",
       );
       if (!!brand && !!model) {
-        await prisma.carCard.update({
+        await prismaMongoClient.carCard.update({
           where: { id: car.id },
           data: {
             carBrand: brand.value,
@@ -23,13 +23,13 @@ export const updateCarCardBrands = async () => {
         });
       }
       if (!!year) {
-        await prisma.carCard.update({
+        await prismaMongoClient.carCard.update({
           where: { id: car.id },
           data: { carYear: year.value },
         });
       }
       if (!!vin) {
-        await prisma.carCard.update({
+        await prismaMongoClient.carCard.update({
           where: { id: car.id },
           data: { carVin: vin.value },
         });

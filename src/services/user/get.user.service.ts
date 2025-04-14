@@ -1,4 +1,4 @@
-import prisma from "../../prisma";
+import { prismaMongoClient } from "../../prisma";
 import { Prisma } from "@prisma/client";
 import { generateUserKey } from "../../utils/redisKeys/generateUserKey";
 import { redisClient } from "../../redisClient";
@@ -18,7 +18,9 @@ export const getUserService = async (
       await redisClient.del(userKey);
     }
 
-    const user = await prisma.user.findUnique({ where: { id: userId } });
+    const user = await prismaMongoClient.user.findUnique({
+      where: { id: userId },
+    });
 
     await redisClient.set(userKey, JSON.stringify(user));
     return user;

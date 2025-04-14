@@ -1,5 +1,5 @@
 import { Prisma } from "@prisma/client";
-import prisma from "../../prisma";
+import { prismaMongoClient } from "../../prisma";
 import { createBucket } from "../bucket/create.bucket.service";
 import { createWishlistService } from "../wishlist/create.wishlist.service";
 import { ONE_MONTH_CACHE_TTL, redisClient } from "../../redisClient";
@@ -12,7 +12,7 @@ export const createUserService = async (
   const ref = refId ? await getRefService(refId) : null;
   console.log(ref);
   try {
-    const user = await prisma.user.create({
+    const user = await prismaMongoClient.user.create({
       data: { ...userDto, ...(ref ? { Ref: { connect: { id: refId } } } : {}) },
     });
     const bucket = await createBucket(user.id);

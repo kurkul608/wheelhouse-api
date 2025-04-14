@@ -1,5 +1,5 @@
 import { Prisma, UserRole } from "@prisma/client";
-import prisma from "../../prisma";
+import { prismaMongoClient } from "../../prisma";
 import { ONE_MONTH_CACHE_TTL, redisClient } from "../../redisClient";
 
 export const updateRoleUserService = async (
@@ -7,7 +7,9 @@ export const updateRoleUserService = async (
   role: UserRole,
 ): Promise<Prisma.UserGetPayload<any>> => {
   try {
-    const user = await prisma.user.findUnique({ where: { id: userId } });
+    const user = await prismaMongoClient.user.findUnique({
+      where: { id: userId },
+    });
     if (!user) {
       throw new Error("User does not exist");
     }
@@ -45,11 +47,13 @@ export const updateRoleUserService = async (
       await redisClient.del(cacheKey);
     }
 
-    await prisma.user.update({
+    await prismaMongoClient.user.update({
       where: { id: userId },
       data: { roles: getNewRoles() },
     });
-    const updatedUser = await prisma.user.findUnique({ where: { id: userId } });
+    const updatedUser = await prismaMongoClient.user.findUnique({
+      where: { id: userId },
+    });
 
     await redisClient.set(
       cacheKey,

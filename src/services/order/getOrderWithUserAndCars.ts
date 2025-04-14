@@ -1,4 +1,4 @@
-import prisma from "../../prisma";
+import { prismaMongoClient } from "../../prisma";
 import { Prisma } from "@prisma/client";
 
 export const getOrderWithUserAndCars = async (
@@ -11,7 +11,7 @@ export const getOrderWithUserAndCars = async (
   };
 }> | null> => {
   try {
-    const order = await prisma.order.findUnique({
+    const order = await prismaMongoClient.order.findUnique({
       where: { id: orderId },
       include: {
         carCards: { include: { specifications: true } },

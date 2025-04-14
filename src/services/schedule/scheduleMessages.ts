@@ -1,4 +1,4 @@
-import prisma from "../../prisma";
+import { prismaMongoClient } from "../../prisma";
 import { Message, MessageType, MessageStatus } from "@prisma/client";
 import { messageQueue } from "../../bull/messageQueue";
 import { DateTime } from "luxon";
@@ -8,7 +8,7 @@ export async function scheduleMessages(): Promise<void> {
   const oneHourLater = now.plus({ hours: 1 });
 
   try {
-    const messages: Message[] = await prisma.message.findMany({
+    const messages: Message[] = await prismaMongoClient.message.findMany({
       where: {
         startTime: {
           gte: now.toJSDate(),

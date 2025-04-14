@@ -1,4 +1,4 @@
-import prisma from "../../prisma";
+import { prismaMongoClient } from "../../prisma";
 import { Prisma } from "@prisma/client";
 import { CACHE_TTL, redisClient } from "../../redisClient";
 import { generateCarCardKey } from "../../utils/redisKeys/generateCarCardKey";
@@ -18,7 +18,7 @@ export const getCarCardService = async (
     await redisClient.del(cacheKey);
   }
 
-  const carCard = await prisma.carCard.findUnique({
+  const carCard = await prismaMongoClient.carCard.findUnique({
     where: { id },
     include: {
       photos: {

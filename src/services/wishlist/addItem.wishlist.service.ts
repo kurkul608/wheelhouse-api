@@ -1,4 +1,4 @@
-import prisma from "../../prisma";
+import { prismaMongoClient } from "../../prisma";
 import { getByUserWishlist } from "./getByUser.wishlist";
 import { sendEventToYandexMetrika } from "../sendMetrika/sendMetrika.service";
 import { getUserService } from "../user/get.user.service";
@@ -6,8 +6,8 @@ import { getUserService } from "../user/get.user.service";
 export async function addItemToWishlist(userId: string, carCardId: string) {
   try {
     const [wishlist, carCard] = await Promise.all([
-      prisma.wishlist.findUnique({ where: { userId } }),
-      prisma.carCard.findUnique({ where: { id: carCardId } }),
+      prismaMongoClient.wishlist.findUnique({ where: { userId } }),
+      prismaMongoClient.carCard.findUnique({ where: { id: carCardId } }),
     ]);
 
     if (!wishlist) {
@@ -22,7 +22,7 @@ export async function addItemToWishlist(userId: string, carCardId: string) {
       throw new Error("CarCard is already in the wishlist");
     }
 
-    await prisma.wishlist.update({
+    await prismaMongoClient.wishlist.update({
       where: { userId },
       data: {
         carCardIds: {

@@ -1,4 +1,4 @@
-import prisma from "../../prisma";
+import { prismaMongoClient } from "../../prisma";
 import { Prisma } from "@prisma/client";
 import { redisClient } from "../../redisClient";
 
@@ -20,7 +20,7 @@ export const getByUserBucket = async (
     return JSON.parse(cachedData);
   }
 
-  const bucket = await prisma.bucket.findUnique({
+  const bucket = await prismaMongoClient.bucket.findUnique({
     where: { userId },
     include: {
       BucketCarCard: {

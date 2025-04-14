@@ -1,9 +1,9 @@
-import prisma from "../../prisma";
+import { prismaMongoClient } from "../../prisma";
 import { parse as json2csv } from "json2csv";
 
 export const getCsvUsersByRefWithOrder = async (refId: string) => {
   try {
-    const users = await prisma.user.findMany({
+    const users = await prismaMongoClient.user.findMany({
       where: {
         refId,
         client_orders: {

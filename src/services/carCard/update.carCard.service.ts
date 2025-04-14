@@ -1,4 +1,4 @@
-import prisma from "../../prisma";
+import { prismaMongoClient } from "../../prisma";
 import { Prisma } from "@prisma/client";
 import { CACHE_TTL, redisClient } from "../../redisClient";
 import { updateListCacheCarCardService } from "./updateListCache.carCard.service";
@@ -14,7 +14,10 @@ export const updateCarCardService = async (
   const cacheKey = generateCarCardKey(carCarId);
 
   try {
-    await prisma.carCard.update({ where: { id: carCarId }, data: data });
+    await prismaMongoClient.carCard.update({
+      where: { id: carCarId },
+      data: data,
+    });
 
     if (photosIds) {
       for (const photoId of photosIds) {
@@ -35,7 +38,7 @@ export const updateCarCardService = async (
       console.error("Ошибка при обработке ключей:", err);
     });
 
-    return prisma.carCard.findUnique({ where: { id: carCarId } });
+    return prismaMongoClient.carCard.findUnique({ where: { id: carCarId } });
   } catch (error) {
     console.error(error);
     throw error;

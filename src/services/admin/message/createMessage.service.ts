@@ -1,9 +1,9 @@
 import { Prisma } from "@prisma/client";
-import prisma from "../../../prisma";
+import { prismaMongoClient } from "../../../prisma";
 
 export const createMessageService = async (dto: Prisma.MessageCreateInput) => {
   try {
-    const message = await prisma.message.create({
+    const message = await prismaMongoClient.message.create({
       data: dto,
     });
 

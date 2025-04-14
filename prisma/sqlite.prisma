@@ -1,0 +1,17 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/@prisma/sqlite"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("SQLITE_DATABASE_URL")
+}
+
+model NotificationLog {
+  id         Int      @id @default(autoincrement())
+  campaignId String
+  userId     String
+  createdAt  DateTime @default(now())
+  status     String
+}

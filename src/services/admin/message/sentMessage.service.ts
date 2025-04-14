@@ -1,10 +1,11 @@
-import prisma from "../../../prisma";
+import { prismaMongoClient } from "../../../prisma";
 import { getUsersByUserWhereService } from "../users/getUsersByUserWhere.service";
 import { sendMessageTemplateService } from "../messageTemplate/sendMessageTemplate.service";
+import { createLog } from "../../logs/createLog.service";
 
 export const sentMessageService = async (messageId: string) => {
   try {
-    const message = await prisma.message.findUnique({
+    const message = await prismaMongoClient.message.findUnique({
       where: { id: messageId },
       include: { MessageTemplate: true },
     });
@@ -29,7 +30,13 @@ export const sentMessageService = async (messageId: string) => {
         }[],
         userId: user.id,
         photoIds: message.MessageTemplate.photoIds,
-      });
+      })
+        .then(async () => {
+          await createLog(messageId, user.id, "success");
+        })
+        .catch(async () => {
+          await createLog(messageId, user.id, "fail");
+        });
 
       await new Promise((resolve) => setImmediate(resolve));
     }

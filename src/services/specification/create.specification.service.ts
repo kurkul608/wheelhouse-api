@@ -1,14 +1,13 @@
 import { Prisma } from "@prisma/client";
-import prisma from "../../prisma";
+import { prismaMongoClient } from "../../prisma";
 import { updateListCacheCarCardService } from "../carCard/updateListCache.carCard.service";
 import { updateCarCacheCarCardService } from "../carCard/updateCarCache.carCard.service";
-import { updateCarCardBrands } from "../admin/updateCarCardBrands";
 import { updateCarCardService } from "../carCard/update.carCard.service";
 
 export const createSpecificationService = async (
   specificationDto: Prisma.SpecificationCreateInput,
 ): Promise<Prisma.SpecificationGetPayload<any>> => {
-  const specification = await prisma.specification.create({
+  const specification = await prismaMongoClient.specification.create({
     data: { ...specificationDto },
   });
 

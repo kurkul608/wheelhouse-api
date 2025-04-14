@@ -1,4 +1,4 @@
-import prisma from "../../prisma";
+import { prismaMongoClient } from "../../prisma";
 import { Prisma } from "@prisma/client";
 import { ONE_MONTH_CACHE_TTL, redisClient } from "../../redisClient";
 import { generateWishlistKey } from "../../utils/redisKeys/generateWishlistKey";
@@ -7,7 +7,7 @@ export async function createWishlistService(
   userId: string,
 ): Promise<Prisma.WishlistGetPayload<any>> {
   try {
-    const existingWishlist = await prisma.wishlist.findUnique({
+    const existingWishlist = await prismaMongoClient.wishlist.findUnique({
       where: { userId },
     });
 
@@ -15,7 +15,7 @@ export async function createWishlistService(
       throw new Error("wishlist already exists for this user");
     }
 
-    const wishlist = await prisma.wishlist.create({
+    const wishlist = await prismaMongoClient.wishlist.create({
       data: {
         userId,
       },

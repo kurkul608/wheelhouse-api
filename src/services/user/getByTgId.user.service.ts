@@ -1,7 +1,6 @@
 import { Prisma } from "@prisma/client";
-import prisma from "../../prisma";
-import { createBucket } from "../bucket/create.bucket.service";
-import { CACHE_TTL, ONE_MONTH_CACHE_TTL, redisClient } from "../../redisClient";
+import { prismaMongoClient } from "../../prisma";
+import { ONE_MONTH_CACHE_TTL, redisClient } from "../../redisClient";
 
 export const getByTgIdUserService = async (
   userTgId: number,
@@ -18,7 +17,9 @@ export const getByTgIdUserService = async (
     if (clearCache) {
       await redisClient.del(cacheKey);
     }
-    const user = await prisma.user.findUnique({ where: { tgId: userTgId } });
+    const user = await prismaMongoClient.user.findUnique({
+      where: { tgId: userTgId },
+    });
 
     await redisClient.set(
       cacheKey,

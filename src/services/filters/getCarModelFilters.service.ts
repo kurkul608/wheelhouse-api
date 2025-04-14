@@ -2,7 +2,7 @@ import {
   CarBrandsFilterType,
   getCarBrandsFiltersService,
 } from "./getCarBrandsFilters.service";
-import prisma from "../../prisma";
+import { prismaMongoClient } from "../../prisma";
 import _ from "lodash";
 import { generateCarModelsFiltersKey } from "../../utils/redisKeys/generateCarModelsFiltersKey";
 import { ONE_WEEK_CACHE_TTL, redisClient } from "../../redisClient";
@@ -28,7 +28,7 @@ export const getCarModelFiltersService = async (
     const modelsByBrands: Partial<Record<CarBrandsFilterType, string[]>> = {};
     for (const brand of brands) {
       const values: string[] = (
-        await prisma.carCard.findMany({
+        await prismaMongoClient.carCard.findMany({
           where: {
             isActive: true,
             carBrand: { contains: brand, mode: "insensitive" },

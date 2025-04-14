@@ -1,5 +1,5 @@
 import { MessageTemplate, Prisma } from "@prisma/client";
-import prisma from "../../../prisma";
+import { prismaMongoClient } from "../../../prisma";
 
 export const updateMessageTemplateService = async (
   messageTemplateId: string,
@@ -9,7 +9,7 @@ export const updateMessageTemplateService = async (
   }: Prisma.MessageTemplateUpdateInput & { photoIds?: string[] },
 ): Promise<MessageTemplate> => {
   try {
-    const existTemplate = await prisma.messageTemplate.findUnique({
+    const existTemplate = await prismaMongoClient.messageTemplate.findUnique({
       where: { id: messageTemplateId },
     });
     if (!existTemplate) {
@@ -17,7 +17,7 @@ export const updateMessageTemplateService = async (
     }
 
     if (photoIds && photoIds.length > 0) {
-      const photos = await prisma.file.findMany({
+      const photos = await prismaMongoClient.file.findMany({
         where: {
           id: { in: photoIds },
         },
@@ -28,7 +28,7 @@ export const updateMessageTemplateService = async (
       }
     }
 
-    const messageTemplate = await prisma.messageTemplate.update({
+    const messageTemplate = await prismaMongoClient.messageTemplate.update({
       where: { id: messageTemplateId },
       data: {
         ...dto,

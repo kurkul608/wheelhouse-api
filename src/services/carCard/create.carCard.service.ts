@@ -1,11 +1,11 @@
 import { Prisma } from "@prisma/client";
-import prisma from "../../prisma";
+import { prismaMongoClient } from "../../prisma";
 import { updateListCacheCarCardService } from "./updateListCache.carCard.service";
 
 export const createCarService = async (
   carCardDto: Prisma.CarCardCreateInput,
 ): Promise<Prisma.CarCardGetPayload<any>> => {
-  const carCard = await prisma.carCard.create({
+  const carCard = await prismaMongoClient.carCard.create({
     data: { ...carCardDto, externalId: undefined },
   });
 

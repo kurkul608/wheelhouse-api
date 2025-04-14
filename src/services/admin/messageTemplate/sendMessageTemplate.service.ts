@@ -1,6 +1,6 @@
 import { getUserService } from "../../user/get.user.service";
 import { bot } from "../../../bot";
-import prisma from "../../../prisma";
+import { prismaMongoClient } from "../../../prisma";
 import { InlineKeyboard, InputFile, InputMediaBuilder } from "grammy";
 import { File } from "@prisma/client";
 import { getFileLink } from "../../../utils/getFileLink";
@@ -33,7 +33,7 @@ export const sendMessageTemplateService = async ({
     let photos: File[] = [];
 
     if (photoIds && photoIds.length > 0) {
-      photos = await prisma.file.findMany({
+      photos = await prismaMongoClient.file.findMany({
         where: {
           id: { in: photoIds },
         },

@@ -1,8 +1,8 @@
-import prisma from "../../prisma";
+import { prismaMongoClient } from "../../prisma";
 
 export async function addItemToBucket(userId: string, carCardId: string) {
   try {
-    const bucket = await prisma.bucket.findUnique({
+    const bucket = await prismaMongoClient.bucket.findUnique({
       where: { userId },
     });
 
@@ -10,7 +10,7 @@ export async function addItemToBucket(userId: string, carCardId: string) {
       throw new Error("Bucket not found for this user");
     }
 
-    const bucketCarCardExist = await prisma.bucketCarCard.findFirst({
+    const bucketCarCardExist = await prismaMongoClient.bucketCarCard.findFirst({
       where: { carCardId, bucketId: bucket.id },
     });
 
@@ -18,7 +18,7 @@ export async function addItemToBucket(userId: string, carCardId: string) {
       throw new Error("CarCard is already in the bucket");
     }
 
-    const bucketCarCard = await prisma.bucketCarCard.create({
+    const bucketCarCard = await prismaMongoClient.bucketCarCard.create({
       data: {
         bucketId: bucket.id,
         carCardId,

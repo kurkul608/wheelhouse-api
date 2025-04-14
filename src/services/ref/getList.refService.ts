@@ -1,8 +1,8 @@
 import { Ref } from "@prisma/client";
-import prisma from "../../prisma";
+import { prismaMongoClient } from "../../prisma";
 export const getListRefService = async (): Promise<Ref[]> => {
   try {
-    const refCodes = await prisma.ref.findMany({
+    const refCodes = await prismaMongoClient.ref.findMany({
       orderBy: {
         createdAt: "desc",
       },

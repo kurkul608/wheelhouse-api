@@ -1,4 +1,4 @@
-import prisma from "../../prisma";
+import { prismaMongoClient } from "../../prisma";
 import { CACHE_TTL, redisClient } from "../../redisClient";
 import { updateListCacheCarCardService } from "./updateListCache.carCard.service";
 import { generateCarCardKey } from "../../utils/redisKeys/generateCarCardKey";
@@ -11,7 +11,7 @@ export const removePhotoFromCarCard = async (
 ) => {
   try {
     const cacheKey = generateCarCardKey(carCardId);
-    const carCard = await prisma.carCard.findUnique({
+    const carCard = await prismaMongoClient.carCard.findUnique({
       where: { id: carCardId },
       include: {
         photos: {
@@ -32,7 +32,7 @@ export const removePhotoFromCarCard = async (
       throw new Error("File is not associated with this CarCard");
     }
 
-    await prisma.carCard.update({
+    await prismaMongoClient.carCard.update({
       where: { id: carCardId },
       data: {
         photos: {

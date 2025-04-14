@@ -1,5 +1,5 @@
 import { WhereUsersEnum, User, UserRole } from "@prisma/client";
-import prisma from "../../../prisma";
+import { prismaMongoClient } from "../../../prisma";
 
 export const getUsersByUserWhereService = async (
   userWhere: WhereUsersEnum,
@@ -13,7 +13,7 @@ export const getUsersByUserWhereService = async (
   try {
     switch (userWhere) {
       case WhereUsersEnum.ONCE_USE_BOT: {
-        const users = await prisma.user.findMany();
+        const users = await prismaMongoClient.user.findMany();
         return users;
       }
       case WhereUsersEnum.N_AUTO_IN_WISHLIST: {
@@ -22,7 +22,7 @@ export const getUsersByUserWhereService = async (
           return [];
         }
 
-        const usersWithWishlist = await prisma.user.findMany({
+        const usersWithWishlist = await prismaMongoClient.user.findMany({
           include: {
             Wishlist: true,
           },
@@ -43,7 +43,7 @@ export const getUsersByUserWhereService = async (
           return [];
         }
 
-        const usersWithWishlist = await prisma.user.findMany({
+        const usersWithWishlist = await prismaMongoClient.user.findMany({
           include: {
             Wishlist: {
               include: {
@@ -74,7 +74,7 @@ export const getUsersByUserWhereService = async (
           return [];
         }
 
-        const usersWithOrders = await prisma.user.findMany({
+        const usersWithOrders = await prismaMongoClient.user.findMany({
           include: {
             client_orders: true,
           },
@@ -93,7 +93,7 @@ export const getUsersByUserWhereService = async (
           return [];
         }
 
-        const usersWithOrders = await prisma.user.findMany({
+        const usersWithOrders = await prismaMongoClient.user.findMany({
           include: {
             client_orders: {
               include: {
@@ -121,7 +121,7 @@ export const getUsersByUserWhereService = async (
       }
 
       case WhereUsersEnum.ADMIN_ONLY: {
-        const users = await prisma.user.findMany({
+        const users = await prismaMongoClient.user.findMany({
           where: { roles: { has: UserRole.ADMIN } },
         });
         return users;

@@ -1,6 +1,6 @@
-import prisma from "../../prisma";
+import { prismaMongoClient } from "../../prisma";
 import { Prisma } from "@prisma/client";
-import { CACHE_TTL, ONE_MONTH_CACHE_TTL, redisClient } from "../../redisClient";
+import { ONE_MONTH_CACHE_TTL, redisClient } from "../../redisClient";
 import { generateWishlistKey } from "../../utils/redisKeys/generateWishlistKey";
 
 export const getByUserWishlist = async (
@@ -20,7 +20,7 @@ export const getByUserWishlist = async (
     await redisClient.del(cacheKey);
   }
 
-  const wishlist = await prisma.wishlist.findUnique({
+  const wishlist = await prismaMongoClient.wishlist.findUnique({
     where: { userId },
     include: {
       carCards: {

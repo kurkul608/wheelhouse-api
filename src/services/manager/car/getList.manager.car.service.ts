@@ -1,4 +1,4 @@
-import prisma from "../../../prisma";
+import { prismaMongoClient } from "../../../prisma";
 
 interface GetListManagerCarService {
   searchString?: string;
@@ -16,7 +16,7 @@ export const getListManagerCarService = async ({
       isActive,
     };
 
-    const cars = await prisma.carCard.findMany({
+    const cars = await prismaMongoClient.carCard.findMany({
       include: {
         photos: {
           orderBy: {

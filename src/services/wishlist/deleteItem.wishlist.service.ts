@@ -1,4 +1,4 @@
-import prisma from "../../prisma";
+import { prismaMongoClient } from "../../prisma";
 import { getByUserWishlist } from "./getByUser.wishlist";
 
 export async function deleteItemFromWishlist(
@@ -7,8 +7,8 @@ export async function deleteItemFromWishlist(
 ) {
   try {
     const [wishlist, carCard] = await Promise.all([
-      prisma.wishlist.findUnique({ where: { userId } }),
-      prisma.carCard.findUnique({ where: { id: carCardId } }),
+      prismaMongoClient.wishlist.findUnique({ where: { userId } }),
+      prismaMongoClient.carCard.findUnique({ where: { id: carCardId } }),
     ]);
 
     if (!wishlist) {
@@ -23,7 +23,7 @@ export async function deleteItemFromWishlist(
       throw new Error("CarCard is not wishlist");
     }
 
-    await prisma.wishlist.update({
+    await prismaMongoClient.wishlist.update({
       where: { userId },
       data: {
         carCardIds: {

@@ -1,4 +1,4 @@
-import prisma from "../../prisma";
+import { prismaMongoClient } from "../../prisma";
 import { Ref } from "@prisma/client";
 
 export const getRefService = async (
@@ -6,14 +6,16 @@ export const getRefService = async (
   expanded?: boolean,
 ): Promise<Ref | (Ref & { usersCount: number }) | null | undefined> => {
   try {
-    const ref = await prisma.ref.findUnique({ where: { id: refId } });
+    const ref = await prismaMongoClient.ref.findUnique({
+      where: { id: refId },
+    });
 
     if (!expanded) {
       return ref;
     }
 
-    const usersCount = await prisma.user.count({ where: { refId } });
-    const usersWithOrderCount = await prisma.user.count({
+    const usersCount = await prismaMongoClient.user.count({ where: { refId } });
+    const usersWithOrderCount = await prismaMongoClient.user.count({
       where: {
         refId,
         client_orders: {

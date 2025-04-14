@@ -1,4 +1,4 @@
-import prisma from "../../prisma";
+import { prismaMongoClient } from "../../prisma";
 import { Prisma } from "@prisma/client";
 
 export const getByCarIdSpecificationService = async (
@@ -7,7 +7,8 @@ export const getByCarIdSpecificationService = async (
   const withCarId = Prisma.validator<Prisma.SpecificationFindManyArgs>()({
     where: { carCardId },
   });
-  const specifications = await prisma.specification.findMany(withCarId);
+  const specifications =
+    await prismaMongoClient.specification.findMany(withCarId);
 
   return specifications;
 };

@@ -1,16 +1,16 @@
-import prisma from "../../prisma";
+import { prismaMongoClient } from "../../prisma";
 import { updateCarCacheCarCardService } from "../carCard/updateCarCache.carCard.service";
 
 export const deleteSpecificationService = async (specificationId: string) => {
   try {
-    const spec = await prisma.specification.findUnique({
+    const spec = await prismaMongoClient.specification.findUnique({
       where: { id: specificationId },
     });
     if (!spec) {
       throw new Error("Specification not found");
     }
 
-    await prisma.specification.delete({
+    await prismaMongoClient.specification.delete({
       where: { id: specificationId },
     });
 

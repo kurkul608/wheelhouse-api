@@ -1,11 +1,14 @@
-import prisma from "../../prisma";
+import { prismaMongoClient } from "../../prisma";
 
 export const addManagerOrderService = async (
   orderId: string,
   managerId: string,
 ) => {
   try {
-    await prisma.order.update({ where: { id: orderId }, data: { managerId } });
+    await prismaMongoClient.order.update({
+      where: { id: orderId },
+      data: { managerId },
+    });
   } catch (error) {
     console.log("Adding manager to order error: ", error);
     throw error;

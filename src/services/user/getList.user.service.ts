@@ -1,6 +1,5 @@
-import prisma from "../../prisma";
+import { prismaMongoClient } from "../../prisma";
 import { Prisma } from "@prisma/client";
-import * as sea from "node:sea";
 
 const removeAtSymbol = (input: string): string => {
   if (input.startsWith("@")) {
@@ -13,12 +12,12 @@ export const getListUserService = async (
 ): Promise<Prisma.UserGetPayload<any>[]> => {
   try {
     if (!searchString) {
-      return await prisma.user.findMany();
+      return await prismaMongoClient.user.findMany();
     }
 
     const updatedSearchString = removeAtSymbol(searchString);
 
-    const users = await prisma.user.findMany({
+    const users = await prismaMongoClient.user.findMany({
       where: {
         OR: [
           {

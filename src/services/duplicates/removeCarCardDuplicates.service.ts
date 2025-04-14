@@ -1,9 +1,8 @@
-import prisma from "../../prisma";
-import { bot } from "../../bot";
+import { prismaMongoClient } from "../../prisma";
 
 export const removeCarCardDuplicatesService = async () => {
   try {
-    const carCards = await prisma.carCard.findMany({
+    const carCards = await prismaMongoClient.carCard.findMany({
       where: { externalId: { not: null } },
       orderBy: { updatedAt: "desc" },
     });
@@ -31,11 +30,11 @@ export const removeCarCardDuplicatesService = async () => {
         const duplicates = cards.slice(1);
 
         for (const duplicate of duplicates) {
-          await prisma.specification.deleteMany({
+          await prismaMongoClient.specification.deleteMany({
             where: { carCardId: duplicate.id },
           });
 
-          await prisma.carCard.delete({
+          await prismaMongoClient.carCard.delete({
             where: { id: duplicate.id },
           });
         }

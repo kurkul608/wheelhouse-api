@@ -25,10 +25,7 @@ messageQueue.process(async (job) => {
     await sentMessageService(messageId);
     // Обновляем запись, чтобы отметить, что сообщение отправлено
     await updateMessageService(messageId, { isSend: true });
-    // await prisma.message.update({
-    //   where: { id: messageId },
-    //   data: { isSend: true },
-    // });
+
     console.log(`Сообщение ${messageId} успешно отправлено.`);
   } catch (error) {
     console.error(`Ошибка при отправке сообщения ${messageId}:`, error);
