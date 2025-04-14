@@ -2,11 +2,12 @@ import { prismaMongoClient } from "../../../prisma";
 import { getUsersByUserWhereService } from "../users/getUsersByUserWhere.service";
 import { sendMessageTemplateService } from "../messageTemplate/sendMessageTemplate.service";
 import { createLog } from "../../logs/createLog.service";
+import { MessageStatus } from "@prisma/client";
 
 export const sentMessageService = async (messageId: string) => {
   try {
     const message = await prismaMongoClient.message.findUnique({
-      where: { id: messageId },
+      where: { id: messageId, status: MessageStatus.ACTIVE },
       include: { MessageTemplate: true },
     });
 
