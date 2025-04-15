@@ -2,6 +2,8 @@ FROM node:22
 
 WORKDIR /app
 
+ARG SQLITE_DATABASE_URL
+
 #RUN \
 #  apt-get update && \
 #  apt-get install -y ca-certificates && \
