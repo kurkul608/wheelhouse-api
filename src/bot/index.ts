@@ -43,6 +43,11 @@ function parseQuery(queryStr: string, key: string) {
   return params.get(key);
 }
 
+bot.use(async (ctx, next) => {
+  if (ctx.chat?.type !== "private") return;
+  await next();
+});
+
 bot.command("start", async (ctx) => {
   try {
     const existUser = await getByTgIdUserService(ctx.from!.id);
