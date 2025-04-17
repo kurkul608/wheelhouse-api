@@ -44,7 +44,6 @@ function parseQuery(queryStr: string, key: string) {
 }
 
 bot.use(async (ctx, next) => {
-  console.log(ctx.chat?.id);
   if (ctx.chat?.type !== "private") return;
   await next();
 });
