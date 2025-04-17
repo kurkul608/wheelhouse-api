@@ -1,7 +1,6 @@
-import { getUserService } from "../../user/get.user.service";
 import { bot } from "../../../bot";
 import { prismaMongoClient } from "../../../prisma";
-import { InlineKeyboard,  InputMediaBuilder } from "grammy";
+import { InlineKeyboard, InputMediaBuilder } from "grammy";
 import { File } from "@prisma/client";
 import { getFileLink } from "../../../utils/getFileLink";
 
@@ -13,23 +12,18 @@ const convertToTelegramHTML = (html: string) => {
   return html.trim();
 };
 
-export const sendMessageTemplateService = async ({
+export const sendMessageToChanelTemplateService = async ({
   messageText,
   photoIds,
   links,
-  userId,
+  chanelId,
 }: {
   messageText: string;
-  userId: string;
+  chanelId: string | number;
   photoIds?: string[];
   links?: { label: string; value: string }[];
 }): Promise<{ message: string }> => {
   try {
-    const user = await getUserService(userId);
-
-    if (!user || !user.tgId) {
-      throw new Error("user not found");
-    }
     let photos: File[] = [];
 
     if (photoIds && photoIds.length > 0) {
@@ -60,7 +54,7 @@ export const sendMessageTemplateService = async ({
     const inlineKeyboard = InlineKeyboard.from(buttonRows);
 
     if (photos.length === 1) {
-      await bot.api.sendPhoto(user.tgId, getFileLink(photos[0]), {
+      await bot.api.sendPhoto(chanelId, getFileLink(photos[0]), {
         caption: convertToTelegramHTML(messageText),
         parse_mode: "HTML",
         ...(links?.length ? { reply_markup: inlineKeyboard } : {}),
@@ -84,15 +78,20 @@ export const sendMessageTemplateService = async ({
 
       console.log(mediaGroup);
 
-      await bot.api.sendMediaGroup(user.tgId, mediaGroup);
+      await bot.api.sendMediaGroup(chanelId, mediaGroup);
 
       return { message: "success" };
     }
 
-    await bot.api.sendMessage(user.tgId, convertToTelegramHTML(messageText), {
-      parse_mode: "HTML",
-      ...(links?.length ? { reply_markup: inlineKeyboard } : {}),
-    });
+    console.log("Before sendMessage");
+    await bot.api
+      .sendMessage(chanelId, convertToTelegramHTML(messageText), {
+        parse_mode: "HTML",
+        ...(links?.length ? { reply_markup: inlineKeyboard } : {}),
+      })
+      .catch((error) => {
+        console.log("error, ", error.message);
+      });
 
     return { message: "success" };
   } catch (error) {

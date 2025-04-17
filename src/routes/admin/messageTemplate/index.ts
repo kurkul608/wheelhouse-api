@@ -6,11 +6,63 @@ import { getMessageTemplateListService } from "../../../services/admin/messageTe
 import { getMessageTemplateService } from "../../../services/admin/messageTemplate/getMessageTemplate.service";
 import { sendMessageTemplateService } from "../../../services/admin/messageTemplate/sendMessageTemplate.service";
 import { updateMessageTemplateService } from "../../../services/admin/messageTemplate/updateMessageTemplate.service";
+import { sendMessageToChanelTemplateService } from "../../../services/admin/messageTemplate/sendMessageToChanelTemplate.service";
 
 export async function adminTemplateRoutes(fastify: FastifyInstance) {
   fastify.addHook("preHandler", authMiddleware);
   fastify.addHook("preHandler", adminMiddleware);
+  fastify.post(
+    "/admin/messageTemplate/sent-to-chanel",
+    {
+      schema: {
+        body: {
+          type: "object",
+          properties: {
+            text: { type: "string" },
+            chanelId: { type: "string" },
+            photoIds: {
+              type: "array",
+              items: { type: "string" },
+            },
+            links: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  label: { type: "string" },
+                  value: { type: "string" },
+                },
+                required: ["label", "value"],
+              },
+            },
+          },
+          required: ["text", "chanelId"],
+        },
+      },
+    },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      try {
+        const { text, chanelId, photoIds, links } = request.body as {
+          text: string;
+          chanelId: string;
+          photoIds?: string[];
+          links?: { label: string; value: string }[];
+        };
 
+        const result = await sendMessageToChanelTemplateService({
+          chanelId,
+          links,
+          messageText: text,
+          photoIds,
+        });
+
+        reply.status(200).send(result);
+      } catch (error) {
+        fastify.log.error("Error sending messageTemplate ", error);
+        reply.status(500).send({ error: "Unable to sending messageTemplate" });
+      }
+    },
+  );
   fastify.post(
     "/admin/messageTemplate/sent",
     {
