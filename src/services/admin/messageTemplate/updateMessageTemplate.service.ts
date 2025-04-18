@@ -1,5 +1,6 @@
 import { MessageTemplate, Prisma } from "@prisma/client";
 import { prismaMongoClient } from "../../../prisma";
+import { date } from "zod";
 
 export const updateMessageTemplateService = async (
   messageTemplateId: string,
@@ -27,6 +28,8 @@ export const updateMessageTemplateService = async (
         throw new Error("Один или несколько файлов не найдены");
       }
     }
+
+    console.log(dto);
 
     const messageTemplate = await prismaMongoClient.messageTemplate.update({
       where: { id: messageTemplateId },

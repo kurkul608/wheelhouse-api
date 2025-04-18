@@ -15,7 +15,6 @@ export const sendMessageTemplateService = async ({
       throw new Error("user not found");
     }
 
-    console.log("in sendMessageTemplateService");
     return sendMessageTemplate({ chatId: user.tgId, ...data });
   } catch (error) {
     throw error;

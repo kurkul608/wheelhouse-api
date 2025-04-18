@@ -126,6 +126,10 @@ const findCars = async ({
     });
   }
 
+  (baseQuery.where.AND as Prisma.CarCardWhereInput[])?.push({
+    isActive: true,
+  });
+
   return prismaMongoClient.carCard.findMany(baseQuery);
 };
 
@@ -213,7 +217,9 @@ export const sendMessageTemplate = async ({
       await bot.api.sendPhoto(chatId, getFileLink(photos[0]), {
         caption: convertToTelegramHTML(messageText),
         parse_mode: "HTML",
-        ...(links?.length ? { reply_markup: inlineKeyboard } : {}),
+        ...(inlineKeyboard?.inline_keyboard?.length
+          ? { reply_markup: inlineKeyboard }
+          : {}),
       });
       return { message: "success" };
     }
@@ -238,7 +244,9 @@ export const sendMessageTemplate = async ({
 
     await bot.api.sendMessage(chatId, convertToTelegramHTML(messageText), {
       parse_mode: "HTML",
-      ...(links?.length ? { reply_markup: inlineKeyboard } : {}),
+      ...(inlineKeyboard?.inline_keyboard?.length
+        ? { reply_markup: inlineKeyboard }
+        : {}),
     });
 
     return { message: "success" };
