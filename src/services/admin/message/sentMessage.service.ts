@@ -31,6 +31,32 @@ export const sentMessageService = async (messageId: string) => {
         }[],
         userId: user.id,
         photoIds: message.MessageTemplate.photoIds,
+        ...(message.MessageTemplate.carsWhereStock
+          ? { carsWhereStock: message.MessageTemplate.carsWhereStock }
+          : {}),
+        ...(message.MessageTemplate.carsWhere
+          ? { carsWhere: message.MessageTemplate.carsWhere }
+          : {}),
+        ...(message.MessageTemplate.carsWhereDefaultPeriod
+          ? {
+              carsWhereDefaultPeriod:
+                message.MessageTemplate.carsWhereDefaultPeriod,
+            }
+          : {}),
+        ...(message.MessageTemplate.carsWherePeriodStart
+          ? {
+              carsWherePeriodStart: String(
+                message.MessageTemplate.carsWherePeriodStart,
+              ),
+            }
+          : {}),
+        ...(message.MessageTemplate.carsWherePeriodEnd
+          ? {
+              carsWherePeriodEnd: String(
+                message.MessageTemplate.carsWherePeriodEnd,
+              ),
+            }
+          : {}),
       })
         .then(async () => {
           await createLog(messageId, user.id, "success");

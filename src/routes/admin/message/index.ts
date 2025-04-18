@@ -210,14 +210,6 @@ export async function adminMessageRoutes(fastify: FastifyInstance) {
           });
         }
 
-        if (startTime) {
-          console.log("startTime: ", startTime);
-          console.log(
-            "upgraded time: ",
-            DateTime.fromISO(startTime).toUTC().toJSDate(),
-          );
-        }
-
         const dto: Prisma.MessageCreateInput = {
           name,
           type,

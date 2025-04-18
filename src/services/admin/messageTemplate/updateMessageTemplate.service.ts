@@ -29,8 +29,6 @@ export const updateMessageTemplateService = async (
       }
     }
 
-    console.log(dto);
-
     const messageTemplate = await prismaMongoClient.messageTemplate.update({
       where: { id: messageTemplateId },
       data: {
