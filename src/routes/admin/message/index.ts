@@ -429,15 +429,29 @@ export async function adminMessageRoutes(fastify: FastifyInstance) {
         querystring: {
           type: "object",
           properties: {
-            status: { type: "string", enum: ["ACTIVE", "DISABLED"] },
+            filterByStatus: { type: "string", enum: ["ACTIVE", "DISABLED"] },
+            filterByType: { type: "string", enum: ["ONCE", "PERIOD"] },
+            filterByPeriod: {
+              type: "string",
+              enum: ["EVERY_HOUR", "EVERY_DAY", "EVERY_WEEK", "EVERY_MONTH"],
+            },
           },
         },
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        const { status } = request.query as { status?: MessageStatus };
-        const messages = await getMessageListService({ status });
+        const { filterByStatus, filterByPeriod, filterByType } =
+          request.query as {
+            filterByStatus?: MessageStatus;
+            filterByType?: MessageType;
+            filterByPeriod?: MessagePeriodType;
+          };
+        const messages = await getMessageListService({
+          status: filterByStatus,
+          type: filterByType,
+          periodType: filterByPeriod,
+        });
 
         reply.status(200).send(messages);
       } catch (error) {
