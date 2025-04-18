@@ -35,7 +35,6 @@ const createMessageSchema = {
         type: "string",
         pattern: "^[0-9a-fA-F]{24}$",
       },
-      carCardsWhere: { type: "object" },
       name: { type: "string" },
       status: {
         type: "string",
@@ -99,7 +98,6 @@ const updateMessageBodySchema = {
       type: "string",
       pattern: "^[0-9a-fA-F]{24}$",
     },
-    carCardsWhere: { type: "object" },
     name: { type: "string" },
     status: {
       type: "string",
@@ -145,7 +143,6 @@ export async function adminMessageRoutes(fastify: FastifyInstance) {
         const {
           type,
           periodType,
-          carCardsWhere,
           usersWhere,
           startTime,
           messageTemplateId,
@@ -163,7 +160,6 @@ export async function adminMessageRoutes(fastify: FastifyInstance) {
           messageTemplateId: string;
           brandsAutoInWishlist?: string[];
           brandsAutoInOrders?: string[];
-          carCardsWhere: any;
           status: MessageStatus;
           type: MessageType;
           startTime?: string;
@@ -226,7 +222,6 @@ export async function adminMessageRoutes(fastify: FastifyInstance) {
           name,
           type,
           periodType,
-          carCardsWhere,
           usersWhere,
           ...(startTime
             ? {
@@ -294,7 +289,6 @@ export async function adminMessageRoutes(fastify: FastifyInstance) {
         const {
           type,
           periodType,
-          carCardsWhere,
           usersWhere,
           startTime,
           messageTemplateId,
@@ -311,7 +305,6 @@ export async function adminMessageRoutes(fastify: FastifyInstance) {
           brandsAutoInOrders?: string[];
           name?: string;
           messageTemplateId?: string;
-          carCardsWhere?: any;
           status?: MessageStatus;
           type?: MessageType;
           startTime?: string;
@@ -367,7 +360,6 @@ export async function adminMessageRoutes(fastify: FastifyInstance) {
         const dto: Prisma.MessageUpdateInput = {
           type,
           periodType,
-          carCardsWhere,
           usersWhere,
           ...(startTime
             ? {

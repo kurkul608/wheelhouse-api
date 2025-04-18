@@ -7,6 +7,11 @@ import { getMessageTemplateService } from "../../../services/admin/messageTempla
 import { sendMessageTemplateService } from "../../../services/admin/messageTemplate/sendMessageTemplate.service";
 import { updateMessageTemplateService } from "../../../services/admin/messageTemplate/updateMessageTemplate.service";
 import { sendMessageToChanelTemplateService } from "../../../services/admin/messageTemplate/sendMessageToChanelTemplate.service";
+import {
+  CarsWhereEnum,
+  CarsWherePeriodEnum,
+  CarsWhereStockEnum,
+} from "@prisma/client";
 
 export async function adminTemplateRoutes(fastify: FastifyInstance) {
   fastify.addHook("preHandler", authMiddleware);
@@ -35,18 +40,64 @@ export async function adminTemplateRoutes(fastify: FastifyInstance) {
                 required: ["label", "value"],
               },
             },
+            carsWhere: {
+              type: "string",
+              enum: [
+                "SELECT_BY_USER",
+                "SELECT_BY_USER_PERIOD",
+                "SELECT_BY_DEFAULT_PERIOD",
+              ],
+            },
+            carsWhereDefaultPeriod: {
+              type: "string",
+              enum: ["LAST_DAY", "LAST_WEEK", "LAST_MONTH"],
+            },
+            carsWhereStock: {
+              type: "string",
+              enum: ["IN_STOCK", "IN_ORDER"],
+            },
+            carsWhereByUserIds: {
+              type: "array",
+              items: { type: "string" },
+            },
+            carsWherePeriodStart: {
+              type: "string",
+              format: "date-time",
+            },
+            carsWherePeriodEnd: {
+              type: "string",
+              format: "date-time",
+            },
           },
+
           required: ["text", "chanelId"],
         },
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        const { text, chanelId, photoIds, links } = request.body as {
+        const {
+          text,
+          chanelId,
+          photoIds,
+          links,
+          carsWhereDefaultPeriod,
+          carsWhereStock,
+          carsWhere,
+          carsWherePeriodStart,
+          carsWherePeriodEnd,
+          carsWhereByUserIds,
+        } = request.body as {
           text: string;
           chanelId: string;
           photoIds?: string[];
           links?: { label: string; value: string }[];
+          carsWhere?: CarsWhereEnum;
+          carsWhereDefaultPeriod?: CarsWherePeriodEnum;
+          carsWhereStock?: CarsWhereStockEnum;
+          carsWhereByUserIds?: string[];
+          carsWherePeriodStart?: string;
+          carsWherePeriodEnd?: string;
         };
 
         const result = await sendMessageToChanelTemplateService({
@@ -54,6 +105,12 @@ export async function adminTemplateRoutes(fastify: FastifyInstance) {
           links,
           messageText: text,
           photoIds,
+          carsWhereDefaultPeriod,
+          carsWhereStock,
+          carsWhere,
+          carsWherePeriodStart,
+          carsWherePeriodEnd,
+          carsWhereByUserIds,
         });
 
         reply.status(200).send(result);
@@ -87,6 +144,34 @@ export async function adminTemplateRoutes(fastify: FastifyInstance) {
                 required: ["label", "value"],
               },
             },
+            carsWhere: {
+              type: "string",
+              enum: [
+                "SELECT_BY_USER",
+                "SELECT_BY_USER_PERIOD",
+                "SELECT_BY_DEFAULT_PERIOD",
+              ],
+            },
+            carsWhereDefaultPeriod: {
+              type: "string",
+              enum: ["LAST_DAY", "LAST_WEEK", "LAST_MONTH"],
+            },
+            carsWhereStock: {
+              type: "string",
+              enum: ["IN_STOCK", "IN_ORDER"],
+            },
+            carsWhereByUserIds: {
+              type: "array",
+              items: { type: "string" },
+            },
+            carsWherePeriodStart: {
+              type: "string",
+              format: "date-time",
+            },
+            carsWherePeriodEnd: {
+              type: "string",
+              format: "date-time",
+            },
           },
           required: ["text", "userId"],
         },
@@ -94,11 +179,28 @@ export async function adminTemplateRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        const { text, userId, photoIds, links } = request.body as {
+        const {
+          text,
+          userId,
+          photoIds,
+          links,
+          carsWhereDefaultPeriod,
+          carsWhereStock,
+          carsWhere,
+          carsWherePeriodStart,
+          carsWherePeriodEnd,
+          carsWhereByUserIds,
+        } = request.body as {
           text: string;
           userId: string;
           photoIds?: string[];
           links?: { label: string; value: string }[];
+          carsWhere?: CarsWhereEnum;
+          carsWhereDefaultPeriod?: CarsWherePeriodEnum;
+          carsWhereStock?: CarsWhereStockEnum;
+          carsWhereByUserIds?: string[];
+          carsWherePeriodStart?: string;
+          carsWherePeriodEnd?: string;
         };
 
         const result = await sendMessageTemplateService({
@@ -106,6 +208,12 @@ export async function adminTemplateRoutes(fastify: FastifyInstance) {
           links,
           messageText: text,
           photoIds,
+          carsWhereDefaultPeriod,
+          carsWhereStock,
+          carsWhere,
+          carsWherePeriodStart,
+          carsWherePeriodEnd,
+          carsWhereByUserIds,
         });
 
         reply.status(200).send(result);

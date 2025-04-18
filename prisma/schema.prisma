@@ -78,27 +78,29 @@ enum FiatAsset {
 }
 
 model CarCard {
-  id             String          @id @default(auto()) @map("_id") @db.ObjectId
-  externalId     String?
-  inStock        Boolean         @default(false)
-  specifications Specification[]
-  carModel       String?
-  carBrand       String?
-  carYear        String?
-  carVin         String?
-  photos         File[]
-  importedPhotos String[]
-  description    String
-  price          String?
-  currency       FiatAsset?
-  isActive       Boolean
-  BucketCarCard  BucketCarCard[]
-  orderIds       String[]        @db.ObjectId
-  orders         Order[]         @relation(fields: [orderIds], references: [id])
-  wishlistIds    String[]        @db.ObjectId
-  wishlists      Wishlist[]      @relation(fields: [wishlistIds], references: [id])
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
+  id                 String            @id @default(auto()) @map("_id") @db.ObjectId
+  externalId         String?
+  inStock            Boolean           @default(false)
+  specifications     Specification[]
+  carModel           String?
+  carBrand           String?
+  carYear            String?
+  carVin             String?
+  photos             File[]
+  importedPhotos     String[]
+  description        String
+  price              String?
+  currency           FiatAsset?
+  isActive           Boolean
+  BucketCarCard      BucketCarCard[]
+  orderIds           String[]          @db.ObjectId
+  orders             Order[]           @relation(fields: [orderIds], references: [id])
+  wishlistIds        String[]          @db.ObjectId
+  wishlists          Wishlist[]        @relation(fields: [wishlistIds], references: [id])
+  MessageTemplates   MessageTemplate[] @relation(fields: [messageTemplateIds], references: [id])
+  messageTemplateIds String[]          @db.ObjectId
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
 
   @@index([isActive, inStock, createdAt])
 }
@@ -193,9 +195,34 @@ model MessageTemplate {
 
   links Json[]
 
+  carsWhere              CarsWhereEnum?
+  carsWhereDefaultPeriod CarsWherePeriodEnum?
+  carsWhereStock         CarsWhereStockEnum?
+  carsWhereByUserIds     String[]             @db.ObjectId
+  CarsWhereByUser        CarCard[]            @relation(fields: [carsWhereByUserIds], references: [id])
+  carsWherePeriodStart   DateTime?
+  carsWherePeriodEnd     DateTime?
+
   Message   Message[]
   updatedAt DateTime  @updatedAt
   createdAt DateTime  @default(now())
+}
+
+enum CarsWhereEnum {
+  SELECT_BY_USER
+  SELECT_BY_USER_PERIOD
+  SELECT_BY_DEFAULT_PERIOD
+}
+
+enum CarsWherePeriodEnum {
+  LAST_DAY
+  LAST_WEEK
+  LAST_MONTH
+}
+
+enum CarsWhereStockEnum {
+  IN_STOCK
+  IN_ORDER
 }
 
 model Message {
@@ -210,8 +237,6 @@ model Message {
 
   messageTemplateId String          @db.ObjectId
   MessageTemplate   MessageTemplate @relation(fields: [messageTemplateId], references: [id])
-
-  carCardsWhere Json?
 
   status MessageStatus
   type   MessageType

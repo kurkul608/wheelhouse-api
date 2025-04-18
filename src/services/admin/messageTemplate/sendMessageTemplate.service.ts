@@ -1,100 +1,22 @@
 import { getUserService } from "../../user/get.user.service";
-import { bot } from "../../../bot";
-import { prismaMongoClient } from "../../../prisma";
-import { InlineKeyboard,  InputMediaBuilder } from "grammy";
-import { File } from "@prisma/client";
-import { getFileLink } from "../../../utils/getFileLink";
-
-const convertToTelegramHTML = (html: string) => {
-  html = html.replace(/<\/p>/g, "\n\n");
-  html = html.replace(/<p[^>]*>/g, "");
-  html = html.replace(/<\/?(ul|ol)[^>]*>/g, "");
-  html = html.replace(/<li>(.*?)<\/li>/g, "• $1\n");
-  return html.trim();
-};
+import {
+  sendMessageTemplate,
+  SendMessageTemplate,
+} from "./sendMessageTemplate";
 
 export const sendMessageTemplateService = async ({
-  messageText,
-  photoIds,
-  links,
   userId,
-}: {
-  messageText: string;
-  userId: string;
-  photoIds?: string[];
-  links?: { label: string; value: string }[];
-}): Promise<{ message: string }> => {
+  ...data
+}: Omit<SendMessageTemplate, "chatId"> & { userId: string }) => {
   try {
     const user = await getUserService(userId);
 
     if (!user || !user.tgId) {
       throw new Error("user not found");
     }
-    let photos: File[] = [];
 
-    if (photoIds && photoIds.length > 0) {
-      photos = await prismaMongoClient.file.findMany({
-        where: {
-          id: { in: photoIds },
-        },
-        orderBy: { weight: "asc" },
-      });
-
-      if (photos.length !== photoIds.length) {
-        throw new Error("Один или несколько файлов не найдены");
-      }
-    }
-
-    const linkPairs: [string, string][] = [];
-
-    if (links) {
-      links.forEach((link) => {
-        linkPairs.push([link.label, link.value]);
-      });
-    }
-
-    const buttonRows = linkPairs.map(([label, url]) => [
-      InlineKeyboard.url(label, url),
-    ]);
-
-    const inlineKeyboard = InlineKeyboard.from(buttonRows);
-
-    if (photos.length === 1) {
-      await bot.api.sendPhoto(user.tgId, getFileLink(photos[0]), {
-        caption: convertToTelegramHTML(messageText),
-        parse_mode: "HTML",
-        ...(links?.length ? { reply_markup: inlineKeyboard } : {}),
-      });
-      return { message: "success" };
-    }
-
-    if (photos.length > 1) {
-      const mediaGroup = photos.map((photo, index) =>
-        InputMediaBuilder.photo(
-          getFileLink(photo),
-          index === 0
-            ? {
-                caption: convertToTelegramHTML(messageText),
-                parse_mode: "HTML",
-                // ...(links?.length ? { reply_markup: inlineKeyboard } : {}),
-              }
-            : undefined,
-        ),
-      );
-
-      console.log(mediaGroup);
-
-      await bot.api.sendMediaGroup(user.tgId, mediaGroup);
-
-      return { message: "success" };
-    }
-
-    await bot.api.sendMessage(user.tgId, convertToTelegramHTML(messageText), {
-      parse_mode: "HTML",
-      ...(links?.length ? { reply_markup: inlineKeyboard } : {}),
-    });
-
-    return { message: "success" };
+    console.log("in sendMessageTemplateService");
+    return sendMessageTemplate({ chatId: user.tgId, ...data });
   } catch (error) {
     throw error;
   }
