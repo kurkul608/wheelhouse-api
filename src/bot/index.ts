@@ -48,6 +48,8 @@ bot.use(async (ctx, next) => {
   const SERVICE_CHAT = process.env.SERVICE_CHAT;
 
   const chatId = ctx.chat?.id?.toString();
+  console.log(ctx.chat);
+  console.log(chatId, MANAGER_CHAT, SERVICE_CHAT);
 
   if (
     !chatId ||
@@ -58,7 +60,6 @@ bot.use(async (ctx, next) => {
     return;
   }
 
-  if (ctx.chat?.type !== "private") return;
   await next();
 });
 
