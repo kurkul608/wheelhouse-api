@@ -48,8 +48,6 @@ bot.use(async (ctx, next) => {
   const SERVICE_CHAT = process.env.SERVICE_CHAT;
 
   const chatId = ctx.chat?.id?.toString();
-  console.log(ctx.chat);
-  console.log(chatId, MANAGER_CHAT, SERVICE_CHAT);
 
   if (
     !chatId ||
