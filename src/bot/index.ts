@@ -44,6 +44,20 @@ function parseQuery(queryStr: string, key: string) {
 }
 
 bot.use(async (ctx, next) => {
+  const MANAGER_CHAT = process.env.MANAGER_CHAT;
+  const SERVICE_CHAT = process.env.SERVICE_CHAT;
+
+  const chatId = ctx.chat?.id?.toString();
+
+  if (
+    !chatId ||
+    (chatId !== MANAGER_CHAT &&
+      chatId !== SERVICE_CHAT &&
+      ctx.chat?.type !== "private")
+  ) {
+    return;
+  }
+
   if (ctx.chat?.type !== "private") return;
   await next();
 });
