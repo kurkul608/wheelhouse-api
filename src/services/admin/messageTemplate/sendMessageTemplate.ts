@@ -32,6 +32,10 @@ const convertToTelegramHTML = (html: string) => {
   html = html.replace(/<p[^>]*>/g, "");
   html = html.replace(/<\/?(ul|ol)[^>]*>/g, "");
   html = html.replace(/<li>(.*?)<\/li>/g, "• $1\n");
+
+  html = html.replace(/&nbsp;/gi, " ");
+  html = html.replace(/\u00A0/g, " ");
+
   return html.trim();
 };
 
