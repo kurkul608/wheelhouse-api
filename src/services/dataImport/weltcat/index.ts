@@ -156,7 +156,7 @@ export const getAndSaveWeltCarData = async () => {
     });
 
     await bot.api.sendMessage(
-      process.env.MANAGER_CHAT || "",
+      process.env.SERVICE_CHAT || "",
       `Импорт данных окончен
       Всего получено от партнера ${process.env.WELT_CAR_BASE_URL} ${externalIds.length} автомобилей
       Добавлено новых автомобилей: ${addedCarCards.length} автомобилей
@@ -178,7 +178,7 @@ export const getAndSaveWeltCarData = async () => {
       }, new InlineKeyboard());
 
       await bot.api.sendMessage(
-        process.env.MANAGER_CHAT || "",
+        process.env.SERVICE_CHAT || "",
         "Список добавленных авто",
         { reply_markup: keyboard },
       );
