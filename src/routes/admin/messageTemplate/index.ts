@@ -100,23 +100,20 @@ export async function adminTemplateRoutes(fastify: FastifyInstance) {
           carsWherePeriodEnd?: string;
         };
 
-        console.log("chanelId: ", chanelId);
+        const result = await sendMessageToChanelTemplateService({
+          chanelId,
+          links,
+          messageText: text,
+          photoIds,
+          carsWhereDefaultPeriod,
+          carsWhereStock,
+          carsWhere,
+          carsWherePeriodStart,
+          carsWherePeriodEnd,
+          carsWhereByUserIds,
+        });
 
-        reply.status(200).send({message: "success"})
-        // const result = await sendMessageToChanelTemplateService({
-        //   chanelId,
-        //   links,
-        //   messageText: text,
-        //   photoIds,
-        //   carsWhereDefaultPeriod,
-        //   carsWhereStock,
-        //   carsWhere,
-        //   carsWherePeriodStart,
-        //   carsWherePeriodEnd,
-        //   carsWhereByUserIds,
-        // });
-        //
-        // reply.status(200).send(result);
+        reply.status(200).send(result);
       } catch (error) {
         fastify.log.error("Error sending messageTemplate ", error);
         reply.status(500).send({ error: "Unable to sending messageTemplate" });
