@@ -75,6 +75,7 @@ export async function adminTemplateRoutes(fastify: FastifyInstance) {
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
+      console.log("chanelId: ", chanelId);
       try {
         const {
           text,
