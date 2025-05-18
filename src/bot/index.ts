@@ -171,9 +171,9 @@ bot.command("start", async (ctx) => {
     }
 
     const customEmojiId = "5219767260561823811";
-    const messageText = `ZeuseBot — ваш личный помощник в мире эксклюзивных авто!
+    const messageText = `Wheelhouse — ваш личный помощник в мире эксклюзивных авто!
 
-Соприкасаясь с ZeuseBot, вы получаете:
+Соприкасаясь с Wheelhouse, вы получаете:
 
  Удобную современную платформу с премиальными и проверенными авто из любой точки мира.
 
@@ -183,10 +183,10 @@ bot.command("start", async (ctx) => {
 
  Мгновенную связь с менеджером — без заполнения форм и ожидания.
 
-С ZeuseBot вы становитесь ещё ближе к своей мечте! Всего в несколько секунд.`;
+С Wheelhouse вы становитесь ещё ближе к своей мечте! Всего в несколько секунд.`;
 
     const keyboard = new InlineKeyboard().webApp(
-      "Каталог Zeuse",
+      "Каталог Wheelhouse",
       process.env.MINI_APP_URL || "",
     );
     let startVideoFile: null | Video = null;
@@ -273,10 +273,10 @@ bot.command("channel", async (ctx) => {
 bot.command("catalog", async (ctx) => {
   try {
     const keyboard = new InlineKeyboard().webApp(
-      "Каталог Zeuse",
+      "Каталог Wheelhouse",
       process.env.MINI_APP_URL || "",
     );
-    await ctx.reply("Нажми на кнопку для перехода в каталог Zeuse", {
+    await ctx.reply("Нажми на кнопку для перехода в каталог Wheelhouse", {
       reply_markup: keyboard,
     });
 
@@ -302,15 +302,15 @@ bot.command("catalog", async (ctx) => {
 bot.command("about", async (ctx) => {
   try {
     const keyboard = new InlineKeyboard()
-      .webApp("Каталог Zeuse", process.env.MINI_APP_URL || "")
+      .webApp("Каталог Wheelhouse", process.env.MINI_APP_URL || "")
       .row()
-      .url("Веб сайт Zeuse", "https://zeuse.ru/")
+      .url("Веб сайт Wheelhouse", process.env.WEB_SITE_URL || "")
       .row()
       .url("TG Канал", "t.me/+8SYGKFeWxvpjY2Ey");
     const aboutText = `
-ПОЧЕМУ ZEUSE — ЭТО ВЫБОР, КОТОРЫЙ ВЫ ЗАСЛУЖИВАЕТЕ?
+ПОЧЕМУ Wheelhouse — ЭТО ВЫБОР, КОТОРЫЙ ВЫ ЗАСЛУЖИВАЕТЕ?
 
-• Мы слеплены из одного теста. ZEUSE — это бренд, который разделяет вашу страсть к автомобилям. Мы создаем уникальный опыт для тех, кто ценит качество, скорость и эмоции.
+• Мы слеплены из одного теста. Wheelhouse — это бренд, который разделяет вашу страсть к автомобилям. Мы создаем уникальный опыт для тех, кто ценит качество, скорость и эмоции.
 
 • Эксклюзивные авто со всего мира: доставляем авто в любой комплектации через проверенных партнеров, как для физ.лиц, так и для юр.лиц с НДС. Каждая модель проходит тщательную проверку.
 
@@ -373,8 +373,8 @@ bot.command("about", async (ctx) => {
 bot.command("site", async (ctx) => {
   try {
     const keyboard = new InlineKeyboard().url(
-      "Веб сайт Zeuse",
-      "https://zeuse.ru/",
+      "Веб сайт Wheelhouse",
+      process.env.WEB_SITE_URL,
     );
     await ctx.reply("Нажми на кнопку для перехода на веб сайт", {
       reply_markup: keyboard,
