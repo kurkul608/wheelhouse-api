@@ -4,28 +4,23 @@ WORKDIR /app
 
 ARG SQLITE_DATABASE_URL
 
-#RUN \
-#  apt-get update && \
-#  apt-get install -y ca-certificates && \
-#  apt-get clean \
-#
-COPY package.json yarn.lock ./
+COPY package.json pnpm-lock.yaml ./
 COPY prisma ./prisma/
 
-RUN yarn install
+RUN npm install -g pnpm
+
+RUN pnpm install --frozen-lockfile
 
 RUN npm install -g prisma
 
-RUN npx prisma generate
-RUN npx prisma generate --schema=prisma/sqlite.prisma
-RUN npx prisma db push --schema=prisma/sqlite.prisma
+RUN pnpm exec prisma generate
+RUN pnpm exec prisma generate --schema=prisma/sqlite.prisma
+RUN pnpm exec prisma db push --schema=prisma/sqlite.prisma
 
 COPY . .
 
-RUN #npx prisma db push
-
-RUN yarn build
+RUN pnpm run build
 
 EXPOSE 8080
 
-CMD ["sh", "-c", "npx prisma db push && yarn start"]
+CMD ["sh", "-c", "pnpm exec prisma db push && pnpm run start"]
